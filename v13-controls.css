@@ -1,0 +1,84 @@
+.right-dashboard { min-height: 0; }
+.operation-panel { overflow: hidden; }
+.selected-card-preview { min-height: 310px; padding: 10px; display: grid; justify-items: center; align-content: start; gap: 7px; }
+.preview-card-wrap { width: min(150px, 76%); }
+.preview-card-art { width: 100%; aspect-ratio: 2154 / 3326; display: block; object-fit: cover; border-radius: 6px; border: 1px solid rgba(235,203,128,.62); box-shadow: 0 10px 22px rgba(0,0,0,.42); }
+.selected-card-preview > strong { color: var(--v13-gold-bright); font-family: "STKaiti", "KaiTi", serif; font-size: 17px; }
+.selected-card-preview > p { margin: 0; color: #c8b899; font-size: 10px; line-height: 1.5; text-align: center; }
+.preview-empty { min-height: 265px; width: 100%; display: grid; place-items: center; align-content: center; gap: 10px; text-align: center; color: var(--v13-muted); }
+.preview-empty__mark { width: 82px; height: 116px; display: grid; place-items: center; border: 1px dashed rgba(226,183,93,.42); border-radius: 7px; color: rgba(239,207,130,.65); font-family: "STKaiti", "KaiTi", serif; font-size: 36px; background: rgba(0,0,0,.12); }
+.preview-empty strong { color: #ddc894; font-size: 13px; }
+.preview-empty p { margin: 0; max-width: 210px; font-size: 10px; line-height: 1.45; }
+
+.guide-panel { overflow: hidden; }
+.action-guide { padding: 10px 12px 11px; color: #cfbea0; font-size: 11px; line-height: 1.55; }
+.action-guide p { margin: 0 0 7px; }
+.action-guide ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.action-guide li::marker { color: var(--v13-gold); }
+
+.controls-panel { margin-top: auto; overflow: hidden; }
+.action-controls { display: grid; gap: 8px; padding: 9px; }
+.action-controls .action-button { min-height: 48px; font-weight: 800; letter-spacing: .04em; }
+.action-button--cancel { background: linear-gradient(180deg, #244f5d, #173743); }
+.action-button--save { background: linear-gradient(180deg, #65763f, #46542d); }
+.action-button--primary { background: linear-gradient(180deg, #a36f1e, #724712); color: #fff0c5; border-color: #e3bd67; }
+.action-button--rules { background: linear-gradient(180deg, #773a31, #57261f); }
+
+.card-art,
+.treasure-mini__art,
+.ai-hand-card,
+.treasure-stock__art,
+.location-card-on-board,
+.pile-card__art,
+.hand-card-art,
+.choice-art,
+.winner-art,
+.preview-card-art,
+.overview-treasure__art {
+  object-fit: cover;
+  background-color: #0a2530;
+}
+.card-art--fallback { display: grid; place-items: center; padding: 6px; color: #f1d99a; text-align: center; }
+
+.toast {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 12px);
+  min-width: 220px;
+  max-width: min(640px, 88vw);
+  padding: 10px 16px;
+  border: 1px solid rgba(239,207,130,.5);
+  border-radius: 8px;
+  background: rgba(2,15,20,.96);
+  color: #f6e8c5;
+  box-shadow: 0 14px 36px rgba(0,0,0,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+.modal-root { position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+.modal-root.is-open { pointer-events: auto; display: grid; place-items: center; padding: 24px; background: rgba(0,7,10,.76); }
+.modal {
+  width: min(620px, 94vw);
+  max-height: 84vh;
+  overflow: auto;
+  padding: 22px;
+  border: 1px solid rgba(239,207,130,.55);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #12343a, #071d24);
+  box-shadow: 0 25px 70px rgba(0,0,0,.65);
+}
+.modal h2 { margin: 0 0 8px; color: var(--v13-gold-bright); font-family: "STKaiti", "KaiTi", serif; }
+.modal p { color: #cdbf9f; line-height: 1.65; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 14px; }
+.choice-button { border: 1px solid rgba(214,174,86,.36); border-radius: 8px; background: rgba(0,0,0,.18); color: var(--v13-ink); padding: 10px; cursor: pointer; text-align: left; }
+.choice-button:hover { border-color: var(--v13-gold-bright); }
+.choice-button img, .choice-art { width: 56px; aspect-ratio: 2154 / 3326; object-fit: cover; float: left; margin-right: 9px; border-radius: 4px; }
+.winner-overlay { text-align: center; }
+.winner-overlay .winner-four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+.winner-overlay .winner-four img { width: 100%; border-radius: 6px; }
