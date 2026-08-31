@@ -1,0 +1,45 @@
+(function (root) {
+  const game = root.JQGame;
+  const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+  function ensureSpriteStyle() {
+    if (document.getElementById('jq-card-sprite-style')) return;
+    const style = document.createElement('style');
+    style.id = 'jq-card-sprite-style';
+    const sprite = String(game.CARD_SPRITE || '').replace(/'/g, "\\'");
+    style.textContent = `.jq-sprite-art{background-image:url('${sprite}')!important;background-size:400% 400%!important;background-repeat:no-repeat!important;background-color:#0a2530!important;object-fit:contain!important;}`;
+    document.head.appendChild(style);
+  }
+
+  function applySpriteArt(rootNode = document) {
+    if (!game.CARD_SPRITE) return;
+    ensureSpriteStyle();
+    rootNode.querySelectorAll?.('img[src^="sprite:"]').forEach(img => {
+      const raw = img.getAttribute('src') || '';
+      const index = Number(raw.slice(7));
+      if (!Number.isInteger(index) || index < 0 || index > 15) return;
+      const col = index % 4;
+      const row = Math.floor(index / 4);
+      img.src = transparentPixel;
+      img.classList.add('jq-sprite-art');
+      img.style.backgroundPosition = `${(col / 3) * 100}% ${(row / 3) * 100}%`;
+    });
+  }
+
+  function observe() {
+    applySpriteArt(document);
+    const observer = new MutationObserver(records => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches?.('img[src^="sprite:"]')) applySpriteArt(node.parentElement || document);
+          else applySpriteArt(node);
+        }
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observe, { once: true });
+  else observe();
+})(globalThis);
