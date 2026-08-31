@@ -15,8 +15,15 @@
     return game.LOCATIONS[id]?.name || id;
   }
 
-  function treasureKinds(treasures) {
-    return Object.values(treasures || {}).filter(count => count > 0).length;
+  function playerTreasureGrid(player) {
+    return `<div class="overview-player__treasures">${Object.values(game.TREASURES).map(t => {
+      const count = player.treasures[t.id] || 0;
+      return `<div class="overview-player__treasure ${count > 0 ? 'has-treasure' : 'no-treasure'}" title="${escapeHtml(t.name)} ×${count}">
+        <img src="${escapeHtml(t.asset)}" alt="">
+        <span>${escapeHtml(t.shortName || t.name)}</span>
+        <strong>×${count}</strong>
+      </div>`;
+    }).join('')}</div>`;
   }
 
   function renderPlayerOverview(state) {
@@ -28,7 +35,10 @@
       const role = player.id === 'human' ? '玩家（你）' : player.name;
       return `<div class="overview-player ${player.id === currentId ? 'is-current' : ''}">
         <span class="overview-token overview-token--${player.id}">${label}</span>
-        <span class="overview-player__body"><strong>${escapeHtml(role)}</strong><small>${escapeHtml(locationName(player.position))} · 圣物 ${treasureKinds(player.treasures)}/4</small></span>
+        <span class="overview-player__body">
+          <span class="overview-player__meta"><strong>${escapeHtml(role)}</strong><small>${escapeHtml(locationName(player.position))}</small></span>
+          ${playerTreasureGrid(player)}
+        </span>
         <span class="overview-hand">${player.hand.length}<small>张</small></span>
       </div>`;
     }).join('');
