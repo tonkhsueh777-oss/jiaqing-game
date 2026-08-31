@@ -1,7 +1,7 @@
 (function (root) {
   const game = root.JQGame;
-  game.SAVE_KEY = 'jiaqing-webgame-v5';
-  game.SAVE_VERSION = 5;
+  game.SAVE_KEY = 'jiaqing-webgame-v9';
+  game.SAVE_VERSION = 9;
 
   function resolveStorage(storage) {
     if (storage) return storage;
