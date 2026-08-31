@@ -26,6 +26,27 @@
     }).join('')}</div>`;
   }
 
+  function wireOverviewTarget(target, playerId) {
+    const overview = target.querySelector(`[data-overview-player="${playerId}"]`);
+    const sourceId = playerId === 'ai1' ? 'ai-left' : playerId === 'ai2' ? 'ai-right' : null;
+    const source = sourceId ? document.querySelector(`#${sourceId} .player-card`) : null;
+    if (!overview || !source?.classList.contains('is-legal-target')) return;
+
+    overview.classList.add('is-legal-target');
+    overview.setAttribute('role', 'button');
+    overview.setAttribute('tabindex', '0');
+    overview.setAttribute('aria-label', `选择${playerId === 'ai1' ? 'AI玩家一' : 'AI玩家二'}为目标`);
+
+    const activate = () => source.click();
+    overview.addEventListener('click', activate);
+    overview.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate();
+      }
+    });
+  }
+
   function renderPlayerOverview(state) {
     const target = document.getElementById('player-overview');
     if (!target) return;
@@ -33,7 +54,7 @@
     target.innerHTML = state.players.map(player => {
       const label = player.id === 'human' ? '我' : player.id === 'ai1' ? '甲' : '乙';
       const role = player.id === 'human' ? '玩家（你）' : player.name;
-      return `<div class="overview-player ${player.id === currentId ? 'is-current' : ''}">
+      return `<div class="overview-player ${player.id === currentId ? 'is-current' : ''}" data-overview-player="${player.id}">
         <span class="overview-token overview-token--${player.id}">${label}</span>
         <span class="overview-player__body">
           <span class="overview-player__meta"><strong>${escapeHtml(role)}</strong><small>${escapeHtml(locationName(player.position))}</small></span>
@@ -42,6 +63,9 @@
         <span class="overview-hand">${player.hand.length}<small>张</small></span>
       </div>`;
     }).join('');
+
+    wireOverviewTarget(target, 'ai1');
+    wireOverviewTarget(target, 'ai2');
   }
 
   function renderTreasureOverview(state) {
