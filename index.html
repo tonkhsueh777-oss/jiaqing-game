@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="v13-responsive.css?v=13">
   <link rel="stylesheet" href="v13-treasure-status.css?v=14">
   <link rel="stylesheet" href="v15-board-compact.css?v=15">
+  <link rel="stylesheet" href="v16-reference-layout.css?v=16">
 </head>
 <body>
   <div id="app" class="game-shell">
@@ -54,7 +55,8 @@
     </aside>
 
     <main class="main-dashboard">
-      <section class="top-dashboard-row">
+      <!-- Kept as hidden interaction sources so target-selection logic remains intact. -->
+      <section class="top-dashboard-row" aria-hidden="true">
         <section class="dashboard-panel inventory-panel">
           <div class="panel-heading">宝物库存</div>
           <div id="treasure-bar" class="treasure-bar" aria-label="中央圣物库"></div>
@@ -74,6 +76,10 @@
       <section class="hand-dashboard dashboard-panel" aria-label="玩家手牌区">
         <div id="hand-title" class="panel-heading hand-heading">玩家（你）手牌</div>
         <section id="human-panel" class="human-panel" aria-label="玩家操作区"></section>
+        <div class="hand-side-note" aria-hidden="true">
+          <span class="hand-side-note__mark">御</span>
+          <p>手牌上限：3 张<br>出牌后自动补至 3 张</p>
+        </div>
       </section>
     </main>
 
@@ -106,8 +112,8 @@
   <script src="src/ai.js?v=13"></script>
   <script src="src/storage.js?v=13"></script>
   <script src="src/ui.js?v=13"></script>
-  <script src="src/v13-ui.js?v=14"></script>
-  <script src="src/v15-board-ui.js?v=15"></script>
+  <script src="src/v13-ui.js?v=16"></script>
+  <script src="src/v15-board-ui.js?v=16"></script>
   <script src="src/main.js?v=13"></script>
 </body>
 </html>
