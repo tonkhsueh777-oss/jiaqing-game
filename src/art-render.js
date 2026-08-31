@@ -1,6 +1,6 @@
 (function (root) {
   const game = root.JQGame;
-  const transparentPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+  const transparentPixel = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1' viewBox='0 0 1 1'%3E%3C/svg%3E";
 
   function ensureSpriteStyle() {
     if (document.getElementById('jq-card-sprite-style')) return;
