@@ -1,0 +1,466 @@
+/* V16 reference-frame pass: match the approved three-column game layout.
+   Presentation only. Original card artwork, deck data and game rules remain unchanged. */
+
+.game-shell {
+  width: min(1760px, 100%);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: clamp(300px, 20.5vw, 360px) minmax(0, 1fr) clamp(282px, 19vw, 330px);
+  gap: 6px;
+  align-items: stretch;
+}
+
+/* The top inventory/AI strip repeats information already shown in the left rail. */
+.top-dashboard-row {
+  display: none !important;
+}
+
+.left-dashboard,
+.right-dashboard {
+  gap: 6px;
+}
+
+.main-dashboard {
+  min-width: 0;
+  min-height: calc(100svh - 8px);
+  display: grid;
+  grid-template-rows: minmax(520px, 1fr) 260px;
+  gap: 6px;
+  align-content: stretch;
+}
+
+/* LEFT RAIL --------------------------------------------------------------- */
+.brand-block {
+  min-height: 64px;
+  padding: 10px 12px 8px;
+}
+.brand-block h1 {
+  font-size: clamp(21px, 1.65vw, 29px);
+}
+.brand-block p {
+  display: none;
+}
+
+.panel-heading {
+  min-height: 28px;
+  padding: 5px 9px;
+  font-size: 15px;
+}
+
+.turn-banner {
+  min-height: 48px;
+  margin: 7px 9px 9px;
+  padding: 6px 10px;
+  font-size: 15px;
+}
+
+.player-overview {
+  gap: 4px;
+  padding: 6px;
+}
+.overview-player {
+  min-height: 86px;
+  grid-template-columns: 32px minmax(0, 1fr) 34px;
+  gap: 7px;
+  padding: 6px 7px;
+}
+.overview-token {
+  width: 29px;
+  height: 29px;
+}
+.overview-player__body {
+  gap: 4px;
+}
+.overview-player__meta {
+  min-width: 0;
+}
+.overview-player__meta strong {
+  font-size: 12px;
+}
+.overview-player__meta small {
+  font-size: 9px;
+}
+.overview-player__treasures {
+  gap: 3px;
+}
+.overview-player__treasure {
+  min-height: 22px;
+  padding: 2px 3px;
+  gap: 3px;
+}
+.overview-player__treasure img {
+  width: 16px;
+}
+.overview-player__treasure span,
+.overview-player__treasure strong {
+  font-size: 9px;
+}
+.overview-hand {
+  font-size: 17px;
+}
+
+/* When a command/tactic requires a target, the left player row becomes the target. */
+.overview-player.is-legal-target {
+  cursor: pointer;
+  border-color: rgba(247, 211, 119, .95);
+  background: linear-gradient(90deg, rgba(153, 108, 35, .34), rgba(4, 25, 30, .45));
+  animation: targetGlow 1s ease-in-out infinite alternate;
+}
+.overview-player.is-legal-target::after {
+  content: "点选目标";
+  position: absolute;
+  right: 7px;
+  top: 5px;
+  padding: 2px 5px;
+  border: 1px solid rgba(244, 205, 113, .72);
+  border-radius: 999px;
+  background: rgba(95, 63, 12, .86);
+  color: #ffe7a8;
+  font-size: 8px;
+}
+.overview-player {
+  position: relative;
+}
+
+.treasure-overview {
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 6px;
+}
+.overview-treasure {
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 6px;
+  min-height: 57px;
+  padding: 5px 6px;
+}
+.overview-treasure__art {
+  width: 36px;
+}
+.overview-treasure span {
+  font-size: 10px;
+}
+.overview-treasure strong {
+  font-size: 14px;
+}
+
+.pile-rail {
+  gap: 6px;
+  padding: 6px;
+}
+.pile-card {
+  min-height: 88px;
+  grid-template-columns: 42px 1fr;
+  padding: 6px;
+}
+.pile-card img,
+.pile-card__art {
+  width: 40px;
+}
+.pile-card strong {
+  font-size: 20px;
+}
+
+.game-log {
+  min-height: 122px;
+}
+.log-lines {
+  max-height: 94px;
+  padding-top: 6px;
+  padding-bottom: 7px;
+}
+.left-actions {
+  gap: 6px;
+}
+.left-actions .ghost-button {
+  min-height: 38px;
+  padding: 6px 9px;
+}
+
+/* BOARD ------------------------------------------------------------------ */
+.board-stage {
+  min-height: 0;
+  padding: 4px;
+  overflow: hidden;
+}
+.board-wrap {
+  min-height: 0 !important;
+  height: 100%;
+}
+.board-overlay {
+  transform: none;
+}
+
+.board-cross--vertical {
+  top: 20%;
+  height: 60%;
+}
+.board-cross--horizontal {
+  top: calc(50% - 1px);
+  left: 25%;
+  width: 50%;
+}
+
+.board-node__card-wrap {
+  width: clamp(148px, 10.2vw, 176px);
+  padding: 3px;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .44);
+}
+.location-card-on-board {
+  object-fit: contain;
+}
+
+.board-node--location:not(.is-opened) .board-slot-empty {
+  width: clamp(136px, 9.4vw, 160px);
+}
+.board-node--location:not(.is-opened) .board-node__title,
+.board-node--location:not(.is-opened) .board-node__subtitle {
+  width: 92px;
+}
+.board-node--location[data-location-id="mengxia"] .board-node__title,
+.board-node--location[data-location-id="mengxia"] .board-node__subtitle {
+  left: auto;
+  right: calc(100% + 10px);
+  text-align: right;
+}
+
+.board-node--center {
+  width: clamp(176px, 14vw, 220px);
+  min-height: 106px;
+  padding: 12px 14px;
+}
+.board-node--center .board-node__title {
+  font-size: 18px;
+}
+.board-node--center .board-node__subtitle {
+  font-size: 9px;
+}
+
+.player-token {
+  width: 34px;
+  height: 34px;
+  font-size: 12px;
+}
+
+/* HAND ------------------------------------------------------------------- */
+.hand-dashboard {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  padding-right: 172px;
+}
+.hand-heading {
+  min-height: 32px;
+}
+.human-panel {
+  height: calc(100% - 32px);
+}
+.hand-zone {
+  height: 100%;
+  min-height: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px 10px;
+}
+.hand-card-button {
+  width: clamp(152px, 11.2vw, 192px);
+}
+
+.hand-side-note {
+  position: absolute;
+  right: 10px;
+  top: 42px;
+  bottom: 10px;
+  width: 150px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid rgba(213, 169, 82, .34);
+  border-radius: 8px;
+  background: rgba(2, 20, 25, .48);
+  color: #d8c397;
+  text-align: center;
+}
+.hand-side-note__mark {
+  width: 68px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(213, 169, 82, .22);
+  border-radius: 7px;
+  color: rgba(235, 202, 126, .46);
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: 32px;
+}
+.hand-side-note p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* RIGHT RAIL ------------------------------------------------------------- */
+.right-dashboard {
+  min-height: calc(100svh - 8px);
+}
+.selected-card-preview {
+  min-height: 330px;
+  padding: 9px;
+}
+.preview-card-wrap {
+  width: min(176px, 82%);
+}
+.preview-empty {
+  min-height: 290px;
+}
+.action-guide {
+  padding: 9px 11px 10px;
+  font-size: 10px;
+}
+.action-controls {
+  gap: 7px;
+  padding: 8px;
+}
+.action-controls .action-button {
+  min-height: 52px;
+  font-size: 15px;
+}
+
+/* RESPONSIVE ------------------------------------------------------------- */
+@media (max-width: 1420px) {
+  .game-shell {
+    grid-template-columns: 268px minmax(0, 1fr) 254px;
+  }
+  .main-dashboard {
+    grid-template-rows: minmax(500px, 1fr) 242px;
+  }
+  .hand-dashboard {
+    padding-right: 146px;
+  }
+  .hand-side-note {
+    width: 126px;
+  }
+  .board-node__card-wrap {
+    width: clamp(132px, 10vw, 160px);
+  }
+  .hand-card-button {
+    width: clamp(132px, 10.6vw, 168px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .game-shell {
+    grid-template-columns: 238px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+  .main-dashboard {
+    grid-template-rows: minmax(490px, 1fr) 232px;
+  }
+  .right-dashboard {
+    min-height: 0;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 1fr;
+    gap: 6px;
+  }
+  .controls-panel {
+    margin-top: 0;
+  }
+  .hand-dashboard {
+    padding-right: 0;
+  }
+  .hand-side-note {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .game-shell {
+    display: block;
+    padding: 6px;
+  }
+  .left-dashboard,
+  .main-dashboard,
+  .right-dashboard {
+    margin-bottom: 6px;
+  }
+  .left-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .brand-block,
+  .round-panel,
+  .left-actions {
+    grid-column: 1 / -1;
+  }
+  .main-dashboard {
+    min-height: 0;
+    grid-template-rows: 520px 226px;
+  }
+  .right-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .operation-panel {
+    grid-row: span 2;
+  }
+  .board-node__card-wrap {
+    width: clamp(108px, 18vw, 132px);
+  }
+  .hand-card-button {
+    width: min(29vw, 145px);
+  }
+}
+
+@media (max-width: 620px) {
+  .left-dashboard {
+    display: flex;
+  }
+  .main-dashboard {
+    grid-template-rows: 450px 200px;
+  }
+  .board-node__card-wrap {
+    width: clamp(82px, 22vw, 106px);
+  }
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: clamp(78px, 20vw, 98px);
+  }
+  .board-node--location:not(.is-opened) .board-node__title,
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    width: 68px;
+    font-size: 8px;
+  }
+  .board-node--center {
+    width: 112px;
+    min-height: 78px;
+  }
+  .board-node--center .board-node__title {
+    font-size: 13px;
+  }
+  .hand-zone {
+    gap: 5px;
+    padding-inline: 2px;
+  }
+  .hand-card-button {
+    width: min(30vw, 122px);
+  }
+  .right-dashboard {
+    display: flex;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-dashboard {
+    grid-template-rows: 400px 182px;
+  }
+  .board-node__card-wrap {
+    width: 78px;
+  }
+  .hand-card-button {
+    width: min(31vw, 112px);
+  }
+}
