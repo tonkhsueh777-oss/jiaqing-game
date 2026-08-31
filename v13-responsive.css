@@ -1,0 +1,88 @@
+@keyframes targetGlow {
+  from { box-shadow: 0 0 0 1px rgba(239,207,130,.25), 0 0 8px rgba(239,207,130,.14); }
+  to { box-shadow: 0 0 0 3px rgba(239,207,130,.62), 0 0 24px rgba(239,207,130,.34); }
+}
+
+@media (max-width: 1420px) {
+  .game-shell { grid-template-columns: 260px minmax(0, 1fr) 250px; }
+  .main-dashboard { grid-template-rows: auto minmax(470px, 1fr) 236px; }
+  .top-dashboard-row { grid-template-columns: minmax(0, 1.55fr) minmax(290px, .9fr); }
+  .brand-block h1 { font-size: 22px; }
+  .board-wrap { min-height: 470px; }
+  .board-node { min-width: 135px; min-height: 130px; }
+  .hand-card-button { width: clamp(122px, 10vw, 156px); }
+  .selected-card-preview { min-height: 290px; }
+}
+
+@media (max-width: 1180px) {
+  .game-shell {
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+  .right-dashboard { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; }
+  .controls-panel { margin-top: 0; }
+  .selected-card-preview { min-height: 210px; grid-template-columns: 120px 1fr; align-items: center; justify-items: start; }
+  .preview-card-wrap { width: 110px; grid-row: 1 / 3; }
+  .preview-empty { min-height: 180px; }
+  .main-dashboard { grid-template-rows: auto minmax(470px, 1fr) 230px; }
+}
+
+@media (max-width: 860px) {
+  .game-shell { display: block; padding: 7px; }
+  .left-dashboard, .main-dashboard, .right-dashboard { margin-bottom: 8px; }
+  .left-dashboard { display: grid; grid-template-columns: 1fr 1fr; }
+  .brand-block, .round-panel, .left-actions { grid-column: 1 / -1; }
+  .game-log { min-height: 132px; }
+  .main-dashboard { display: grid; grid-template-rows: auto auto auto; }
+  .top-dashboard-row { grid-template-columns: 1fr; }
+  .ai-status-strip { min-height: 105px; }
+  .board-wrap { min-height: 520px; }
+  .hand-zone { min-height: 210px; padding-inline: 4px; gap: 7px; }
+  .hand-card-button { width: min(29vw, 150px); }
+  .right-dashboard { display: grid; grid-template-columns: 1fr 1fr; }
+  .operation-panel { grid-row: span 2; }
+  .selected-card-preview { min-height: 250px; display: grid; grid-template-columns: 1fr; justify-items: center; }
+  .preview-card-wrap { width: 120px; grid-row: auto; }
+}
+
+@media (max-width: 620px) {
+  .left-dashboard { display: flex; }
+  .top-dashboard-row { gap: 6px; }
+  .treasure-bar { grid-template-columns: 1fr 1fr; }
+  .ai-status-strip { grid-template-columns: 1fr 1fr; }
+  .player-card { padding-right: 10px; }
+  .ai-hand { display: none; }
+  .board-stage { padding: 5px; }
+  .board-wrap { min-height: 450px; }
+  .board-node { width: 32%; min-width: 106px; min-height: 112px; padding: 5px; }
+  .board-node--center { width: 29%; min-width: 98px; min-height: 84px; }
+  .board-node__card-wrap { width: 65px; }
+  .board-slot-empty { min-height: 58px; font-size: 9px; }
+  .board-node__title { font-size: 13px; }
+  .board-node__subtitle { font-size: 8px; }
+  .player-token { width: 27px; height: 27px; font-size: 10px; }
+  .hand-dashboard { overflow: hidden; }
+  .hand-zone { min-height: 190px; gap: 5px; padding: 6px 2px 8px; }
+  .hand-card-button { width: min(30.5vw, 126px); }
+  .card-tooltip { width: min(220px, 68vw); font-size: 10px; }
+  .right-dashboard { display: flex; }
+  .selected-card-preview { min-height: 230px; }
+  .preview-card-wrap { width: 118px; }
+  .action-controls { grid-template-columns: 1fr 1fr; }
+  .action-controls .action-button { min-height: 44px; font-size: 13px; }
+  .winner-overlay .winner-four { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 420px) {
+  .treasure-overview { grid-template-columns: 1fr 1fr; }
+  .pile-rail { grid-template-columns: 1fr 1fr; }
+  .board-wrap { min-height: 390px; }
+  .board-node { width: 34%; min-width: 98px; min-height: 102px; }
+  .board-node--center { width: 30%; min-width: 92px; min-height: 78px; }
+  .hand-card-button { width: min(31vw, 116px); }
+  .hand-zone { min-height: 176px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
