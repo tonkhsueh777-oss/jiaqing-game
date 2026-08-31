@@ -23,14 +23,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Rebuild real card artwork JPG
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, re
+
+          source = Path('src/card-sprite-data-v9.js').read_text(encoding='utf-8')
+          match = re.search(r"base64,([^']+)'", source)
+          if not match:
+              raise SystemExit('Card artwork base64 was not found')
+
+          raw = base64.b64decode(match.group(1), validate=True)
+          if not raw.startswith(b'\xff\xd8') or not raw.endswith(b'\xff\xd9'):
+              raise SystemExit('Decoded card artwork is not a complete JPEG')
+          if len(raw) < 5000:
+              raise SystemExit(f'Card artwork is unexpectedly small: {len(raw)} bytes')
+
+          target = Path('assets/cards-live.jpg')
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_bytes(raw)
+          print(f'Built {target}: {len(raw)} bytes')
+          PY
+          test -s assets/cards-live.jpg
+          file assets/cards-live.jpg
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
