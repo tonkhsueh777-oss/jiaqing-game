@@ -3,11 +3,11 @@
   if (!game?.UI) return;
 
   const DISPLAY_SLOTS = {
-    center: { x: 50, y: 48 },
-    tainan: { x: 50, y: 24 },
-    mengxia: { x: 73, y: 48 },
-    zhuluo: { x: 27, y: 48 },
-    madou: { x: 50, y: 72 }
+    center: { x: 50, y: 50 },
+    tainan: { x: 50, y: 22 },
+    mengxia: { x: 75, y: 50 },
+    zhuluo: { x: 25, y: 50 },
+    madou: { x: 50, y: 78 }
   };
 
   const sourceSlots = game.UI.BOARD_SLOTS || {
