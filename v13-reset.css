@@ -1,0 +1,42 @@
+.game-shell {
+  max-width: none;
+  grid-template-rows: minmax(100vh, auto);
+  grid-template-areas: none;
+}
+
+.player-panel--left,
+.player-panel--right {
+  grid-area: auto;
+}
+
+.board-stage {
+  display: block;
+  grid-template-columns: none;
+}
+
+.board-wrap {
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.pile-card {
+  width: auto;
+}
+
+.game-log {
+  padding: 0;
+}
+
+.human-panel {
+  display: block !important;
+  grid-area: auto;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.hand-card-button {
+  margin-left: 0;
+}
