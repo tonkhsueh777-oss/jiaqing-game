@@ -1,0 +1,267 @@
+/* V15 board density pass: presentation only. Original card artwork and game rules remain unchanged. */
+
+.main-dashboard {
+  grid-template-rows: auto clamp(420px, 48vh, 500px) 252px;
+  align-content: start;
+}
+
+.board-stage {
+  padding: 6px;
+}
+
+.board-wrap {
+  height: 100%;
+  min-height: 0;
+}
+
+.board-overlay {
+  transform: translateY(-4px);
+}
+
+.board-cross--vertical {
+  top: 24%;
+  height: 48%;
+}
+
+.board-cross--horizontal {
+  top: calc(48% - 1px);
+  left: 27%;
+  width: 46%;
+}
+
+.board-node--location {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.board-node--location.is-opened {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.board-node__card-wrap {
+  width: clamp(118px, 9.5vw, 142px);
+  aspect-ratio: 2154 / 3326;
+  padding: 3px;
+  border-radius: 7px;
+  border: 1px solid rgba(239, 207, 130, .52);
+  background: rgba(0, 0, 0, .18);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .38);
+}
+
+.location-card-on-board {
+  object-fit: contain;
+}
+
+/* Opened location cards already contain their own title and description. */
+.board-node--location.is-opened .board-node__title,
+.board-node--location.is-opened .board-node__subtitle {
+  display: none;
+}
+
+.board-node--location:not(.is-opened) .board-slot-empty {
+  width: clamp(110px, 8.8vw, 130px);
+  min-height: 0;
+  aspect-ratio: 2154 / 3326;
+  padding: 8px;
+  border-radius: 7px;
+}
+
+/* Closed-location helper copy sits beside the slot, never above or below it. */
+.board-node--location:not(.is-opened) .board-node__title,
+.board-node--location:not(.is-opened) .board-node__subtitle {
+  position: absolute;
+  left: calc(100% + 10px);
+  width: 94px;
+  margin: 0;
+  text-align: left;
+  line-height: 1.25;
+  pointer-events: none;
+}
+
+.board-node--location:not(.is-opened) .board-node__title {
+  top: 39%;
+  font-size: 14px;
+}
+
+.board-node--location:not(.is-opened) .board-node__subtitle {
+  top: 55%;
+  font-size: 9px;
+}
+
+.board-node--location[data-location-id="zhuluo"] .board-node__title,
+.board-node--location[data-location-id="zhuluo"] .board-node__subtitle {
+  left: auto;
+  right: calc(100% + 10px);
+  text-align: right;
+}
+
+.board-node--center {
+  width: clamp(142px, 13vw, 174px);
+  min-width: 0;
+  max-width: none;
+  min-height: 92px;
+  padding: 10px 12px;
+}
+
+.board-node--center .board-node__title {
+  font-size: 16px;
+}
+
+.board-node--center .board-node__subtitle {
+  font-size: 9px;
+}
+
+.board-target {
+  width: clamp(126px, 10.5vw, 154px);
+  height: clamp(192px, 16vw, 236px);
+}
+
+.board-target--center {
+  width: clamp(150px, 14vw, 184px);
+  height: 112px;
+}
+
+@media (max-width: 1420px) {
+  .main-dashboard {
+    grid-template-rows: auto clamp(405px, 47vh, 460px) 236px;
+  }
+
+  .board-node__card-wrap {
+    width: clamp(108px, 9.2vw, 132px);
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: clamp(102px, 8.7vw, 122px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .main-dashboard {
+    grid-template-rows: auto 430px 230px;
+  }
+}
+
+@media (max-width: 860px) {
+  .main-dashboard {
+    grid-template-rows: auto 430px auto;
+  }
+
+  .board-wrap {
+    height: 430px;
+    min-height: 0;
+  }
+
+  .board-node__card-wrap {
+    width: clamp(92px, 15vw, 116px);
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: clamp(88px, 14vw, 108px);
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title,
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    width: 72px;
+  }
+}
+
+@media (max-width: 620px) {
+  .main-dashboard {
+    grid-template-rows: auto 390px auto;
+  }
+
+  .board-wrap {
+    height: 390px;
+    min-height: 0;
+  }
+
+  .board-node__card-wrap {
+    width: clamp(72px, 20vw, 88px);
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: clamp(70px, 19vw, 84px);
+    font-size: 9px;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title,
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    left: calc(100% + 5px);
+    width: 56px;
+  }
+
+  .board-node--location[data-location-id="zhuluo"] .board-node__title,
+  .board-node--location[data-location-id="zhuluo"] .board-node__subtitle {
+    left: auto;
+    right: calc(100% + 5px);
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title {
+    top: 38%;
+    font-size: 10px;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    top: 55%;
+    font-size: 7px;
+  }
+
+  .board-node--center {
+    width: 104px;
+    min-height: 76px;
+    padding: 7px;
+  }
+
+  .board-node--center .board-node__title { font-size: 13px; }
+  .board-node--center .board-node__subtitle { font-size: 8px; }
+
+  .board-target {
+    width: 94px;
+    height: 146px;
+  }
+
+  .board-target--center {
+    width: 110px;
+    height: 86px;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-dashboard {
+    grid-template-rows: auto 350px auto;
+  }
+
+  .board-wrap {
+    height: 350px;
+    min-height: 0;
+  }
+
+  .board-node__card-wrap {
+    width: 68px;
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: 66px;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title,
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    width: 48px;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    display: none;
+  }
+}
