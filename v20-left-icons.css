@@ -1,0 +1,173 @@
+/* V20: compact player treasure status.
+   Player status only: replace miniature treasure-card images with symbolic icons + text + quantity.
+   Board, hand area, right rail, stock cards and game rules remain unchanged. */
+
+@media (min-width: 1181px) {
+  .players-overview-panel {
+    overflow: hidden !important;
+  }
+
+  .player-overview {
+    gap: 4px !important;
+    padding: 5px 6px 6px !important;
+  }
+
+  .overview-player {
+    height: 86px !important;
+    min-height: 86px !important;
+    grid-template-columns: minmax(0, 1.42fr) minmax(112px, .82fr) !important;
+    gap: 6px !important;
+    padding: 5px 7px !important;
+  }
+
+  .overview-player__identity {
+    grid-template-columns: 41px minmax(0, 1fr) !important;
+    gap: 7px !important;
+  }
+
+  .overview-token {
+    width: 39px !important;
+    height: 39px !important;
+    font-size: 13px !important;
+  }
+
+  .overview-player__body {
+    gap: 3px !important;
+  }
+
+  .overview-player__meta strong {
+    font-size: 12px !important;
+  }
+
+  .overview-player__meta small {
+    font-size: 8.5px !important;
+  }
+
+  .overview-player__hand-row {
+    gap: 2px !important;
+    font-size: 9.5px !important;
+  }
+
+  .overview-hand-backs {
+    min-height: 22px !important;
+    gap: 3px !important;
+  }
+
+  .overview-hand-backs img {
+    width: 15px !important;
+    height: 22px !important;
+  }
+
+  .overview-player__treasures {
+    display: grid !important;
+    grid-template-rows: repeat(4, 1fr) !important;
+    gap: 1px !important;
+    align-content: stretch !important;
+  }
+
+  .overview-player__treasure {
+    height: auto !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 18px minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 1px 3px !important;
+    border: 0 !important;
+    border-left: 1px solid rgba(219, 171, 77, .26) !important;
+    border-radius: 0 !important;
+    background: rgba(0, 13, 17, .12) !important;
+    filter: none !important;
+  }
+
+  .overview-player__treasure img {
+    display: none !important;
+  }
+
+  .treasure-status-icon {
+    width: 16px;
+    height: 16px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.18);
+    color: #071317;
+    font-family: "STKaiti", "KaiTi", serif;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+  }
+
+  .overview-player__treasure--goldSeal .treasure-status-icon {
+    background: #d8b54f;
+  }
+
+  .overview-player__treasure--sword .treasure-status-icon {
+    background: #71a9c8;
+  }
+
+  .overview-player__treasure--gun .treasure-status-icon {
+    background: #c7c2b7;
+  }
+
+  .overview-player__treasure--pomelo .treasure-status-icon {
+    background: #d6a247;
+  }
+
+  .treasure-status-name {
+    min-width: 0;
+    color: #decaa2;
+    font-size: 9px;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .overview-player__treasure strong {
+    color: #f2d58e !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+  }
+
+  .overview-player__treasure.no-treasure {
+    opacity: .42 !important;
+  }
+
+  .overview-player__treasure.has-treasure {
+    opacity: 1 !important;
+    background: linear-gradient(90deg, rgba(106,78,29,.15), rgba(0,14,18,.06)) !important;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 820px) {
+  .overview-player {
+    height: 80px !important;
+    min-height: 80px !important;
+  }
+
+  .overview-token {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .overview-player__identity {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+  }
+
+  .overview-hand-backs img {
+    width: 14px !important;
+    height: 20px !important;
+  }
+
+  .treasure-status-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+
+  .overview-player__treasure {
+    grid-template-columns: 16px minmax(0, 1fr) auto !important;
+  }
+}
