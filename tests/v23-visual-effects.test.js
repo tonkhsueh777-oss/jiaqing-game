@@ -22,6 +22,13 @@ test('detectTreasureGains returns only positive treasure deltas', () => {
   ]);
 });
 
+test('only the human player is eligible for the treasure reveal effect', () => {
+  assert.equal(logic.shouldShowTreasureGain({ playerId: 'human', treasureId: 'goldSeal', amount: 1 }), true);
+  assert.equal(logic.shouldShowTreasureGain({ playerId: 'ai1', treasureId: 'gun', amount: 1 }), false);
+  assert.equal(logic.shouldShowTreasureGain({ playerId: 'ai2', treasureId: 'pomelo', amount: 1 }), false);
+  assert.equal(logic.shouldShowTreasureGain(null), false);
+});
+
 test('classifyLog maps visual sound events only', () => {
   assert.equal(logic.classifyLog('玩家（你）：打出【巡游】，移动至中央起点。'), 'move');
   assert.equal(logic.classifyLog('AI玩家一：开放地点【台南府城】，该地牌永久留在地图。'), 'location');
