@@ -4,6 +4,7 @@
   if (!game?.Analytics || !game?.UI || !logic) return;
 
   let previousWinnerId = null;
+  const seenStates = new WeakSet();
   const baseRender = game.UI.render.bind(game.UI);
 
   function completionKey(state) {
@@ -22,6 +23,14 @@
 
   game.UI.render = function renderV31Analytics(state) {
     baseRender(state);
+
+    if (state && typeof state === 'object' && !seenStates.has(state)) {
+      seenStates.add(state);
+      if (state.phase === 'setup' && Number(state.turnNumber) === 1 && !state.winnerId) {
+        game.Analytics.recordEvent('game_start');
+      }
+    }
+
     const nextWinnerId = state?.winnerId || null;
     if (logic.shouldRecordCompletion(previousWinnerId, nextWinnerId)) {
       const key = completionKey(state);
