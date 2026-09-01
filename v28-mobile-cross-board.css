@@ -1,4 +1,4 @@
-/* V28 mobile board: preserve the desktop cross topology on phones.
+/* V29 mobile board: preserve the desktop cross topology on phones.
    Presentation only. Rules and desktop layout are unchanged. */
 @media (max-width: 768px) {
   .board-wrap {
@@ -14,7 +14,7 @@
     transform: none !important;
   }
 
-  /* Restore the same top / right / bottom / left / center topology as desktop. */
+  /* Same topology and slot proportions as desktop: top/right/bottom/left/center. */
   .board-cross {
     display: block !important;
     z-index: 1 !important;
@@ -29,9 +29,9 @@
   }
 
   .board-cross--horizontal {
-    left: 18% !important;
+    left: 21% !important;
     top: calc(50% - .5px) !important;
-    width: 64% !important;
+    width: 58% !important;
     height: 1px !important;
   }
 
@@ -43,13 +43,13 @@
 
   .board-node[data-location-id="mengxia"],
   .board-target[data-board-target="mengxia"] {
-    left: 82% !important;
+    left: 79% !important;
     top: 50% !important;
   }
 
   .board-node[data-location-id="zhuluo"],
   .board-target[data-board-target="zhuluo"] {
-    left: 18% !important;
+    left: 21% !important;
     top: 50% !important;
   }
 
@@ -115,7 +115,7 @@
     display: none !important;
   }
 
-  /* Smaller center core, same meaning and same position as desktop. */
+  /* Smaller center core, same position and meaning as desktop. */
   .board-node--center {
     width: min(31vw, 124px) !important;
     min-width: 0 !important;
