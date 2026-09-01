@@ -1,0 +1,51 @@
+name: Build macOS Desktop
+
+on:
+  push:
+    branches:
+      - feature/macos-2_5d-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-universal:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Install frontend tooling
+        run: npm install
+
+      - name: Run regression tests
+        run: npm test
+
+      - name: Build Universal macOS app and DMG
+        run: npm run desktop:build:universal
+
+      - name: Inspect bundle output
+        run: |
+          find src-tauri/target/universal-apple-darwin/release/bundle -maxdepth 3 -print
+
+      - name: Upload macOS desktop bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: jiaqing-macos-2_5d-universal
+          path: |
+            src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+            src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          compression-level: 6
