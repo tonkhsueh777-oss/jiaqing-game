@@ -33,5 +33,26 @@
   }
 
   const sharedController = createController();
-  return { createController, sharedController };
+  let installed = false;
+
+  function install(ui, doc = globalThis.document) {
+    if (installed || !ui || typeof ui.showDrawRitual !== 'function' || !doc?.body?.classList?.contains('desktop-mode')) return false;
+    const baseShowDrawRitual = ui.showDrawRitual.bind(ui);
+    ui.showDrawRitual = async function desktopShowDrawRitual(cards, options = {}) {
+      const token = sharedController.begin();
+      if (!token) return false;
+      doc.body.classList.add('desktop-draw-cinematic-active');
+      try {
+        await baseShowDrawRitual(cards, options);
+        return true;
+      } finally {
+        doc.body.classList.remove('desktop-draw-cinematic-active');
+        sharedController.finish(token);
+      }
+    };
+    installed = true;
+    return true;
+  }
+
+  return { createController, sharedController, install };
 });
