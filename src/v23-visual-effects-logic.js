@@ -19,6 +19,10 @@
     };
   }
 
+  function shouldShowTreasureGain(gain) {
+    return Boolean(gain && gain.playerId === 'human' && Number(gain.amount || 0) > 0);
+  }
+
   function detectTreasureGains(previous, next) {
     if (!previous?.players || !next?.players) return [];
     const gains = [];
@@ -28,20 +32,19 @@
         const nextCount = Number(nextCountRaw || 0);
         const previousCount = Number(previousTreasures[treasureId] || 0);
         const amount = nextCount - previousCount;
-        if (amount > 0) gains.push({ playerId, treasureId, amount });
+        const gain = { playerId, treasureId, amount };
+        if (shouldShowTreasureGain(gain)) gains.push(gain);
       }
     }
     return gains;
   }
 
-  function shouldShowTreasureGain(gain) {
-    return Boolean(gain && gain.playerId === 'human' && Number(gain.amount || 0) > 0);
-  }
-
   function classifyLog(line) {
     const text = String(line || '');
     if (!text) return null;
-    if (text.includes('明察成功') || text.includes('取得【')) return 'treasure';
+    const isTreasureGain = text.includes('明察成功') || text.includes('取得【');
+    if (isTreasureGain && text.includes('AI玩家')) return null;
+    if (isTreasureGain) return 'treasure';
     if (text.includes('打出【巡游】') || text.includes('移动至')) return 'move';
     if (text.includes('开放地点')) return 'location';
     if (text.includes('发动【') || text.includes('强制交换')) return 'command';
