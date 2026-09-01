@@ -1,6 +1,7 @@
 (function (root) {
   const game = root.JQGame;
-  if (!game?.UI) return;
+  const handSwapLayout = game?.HandSwapLayout;
+  if (!game?.UI || !handSwapLayout) return;
 
   let lastState = null;
   const baseRender = game.UI.render.bind(game.UI);
@@ -112,10 +113,11 @@
   function renderControls() {
     const target = document.getElementById('action-controls');
     if (!target) return;
+    const showHandSwap = handSwapLayout.shouldUseHandSideSwap(window.innerWidth || document.documentElement.clientWidth || 1400);
     target.innerHTML = [
       proxyButton('取消选择', 'action-button--cancel', 'cancel', '.human-actions [data-action="cancel"]'),
       proxyButton('保存牌局', 'action-button--save', 'save', '.human-actions [data-action="save"]'),
-      proxyButton('换1张并结束', 'action-button--primary', 'end', '.human-actions [data-action="end"]'),
+      ...(!showHandSwap ? [proxyButton('换1张并结束', 'action-button--primary', 'end', '.human-actions [data-action="end"]')] : []),
       '<button type="button" class="action-button action-button--rules" data-v13-action="rules">规则说明</button>'
     ].join('');
 
@@ -123,6 +125,23 @@
     target.querySelector('[data-v13-action="save"]')?.addEventListener('click', () => document.querySelector('.human-actions [data-action="save"]')?.click());
     target.querySelector('[data-v13-action="end"]')?.addEventListener('click', () => document.querySelector('.human-actions [data-action="end"]')?.click());
     target.querySelector('[data-v13-action="rules"]')?.addEventListener('click', () => document.getElementById('btn-rules')?.click());
+  }
+
+  function renderHandSwapShortcut() {
+    const target = document.querySelector('.hand-side-note');
+    if (!target) return;
+    const source = document.querySelector('.human-actions [data-action="end"]');
+    const showHandSwap = handSwapLayout.shouldUseHandSideSwap(window.innerWidth || document.documentElement.clientWidth || 1400);
+    if (!showHandSwap) {
+      target.innerHTML = '<span class="hand-side-note__mark">御</span><p>手牌上限：3 张<br>出牌后自动补至 3 张</p>';
+      return;
+    }
+    const disabled = source?.disabled ? 'disabled' : '';
+    target.innerHTML = `
+      <span class="hand-side-note__eyebrow">没有牌可打？</span>
+      <button type="button" class="action-button action-button--primary hand-side-swap" data-hand-swap ${disabled}>换1张并结束</button>
+      <p class="hand-side-note__tip">选择它后，再点 1 张手牌换掉；补回新牌后结束本回合。</p>`;
+    target.querySelector('[data-hand-swap]')?.addEventListener('click', () => source?.click());
   }
 
   function renderHandTitle(state) {
@@ -139,6 +158,7 @@
     renderPreview(state);
     renderActionGuide();
     renderControls();
+    renderHandSwapShortcut();
     renderHandTitle(state);
   }
 
@@ -151,4 +171,12 @@
     baseSetInteractionMode(mode, payload);
     enhance(lastState);
   };
+
+  if (typeof window !== 'undefined') {
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (lastState) enhance(lastState); }, 100);
+    });
+  }
 })(globalThis);
