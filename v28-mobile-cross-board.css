@@ -1,0 +1,182 @@
+/* V28 mobile board: preserve the desktop cross topology on phones.
+   Presentation only. Rules and desktop layout are unchanged. */
+@media (max-width: 768px) {
+  .board-wrap {
+    width: 100% !important;
+    height: clamp(360px, 110vw, 430px) !important;
+    min-height: 360px !important;
+    max-height: 430px !important;
+    overflow: hidden !important;
+  }
+
+  .board-overlay {
+    inset: 0 !important;
+    transform: none !important;
+  }
+
+  /* Restore the same top / right / bottom / left / center topology as desktop. */
+  .board-cross {
+    display: block !important;
+    z-index: 1 !important;
+    opacity: .7;
+  }
+
+  .board-cross--vertical {
+    left: calc(50% - .5px) !important;
+    top: 20% !important;
+    width: 1px !important;
+    height: 60% !important;
+  }
+
+  .board-cross--horizontal {
+    left: 18% !important;
+    top: calc(50% - .5px) !important;
+    width: 64% !important;
+    height: 1px !important;
+  }
+
+  .board-node[data-location-id="tainan"],
+  .board-target[data-board-target="tainan"] {
+    left: 50% !important;
+    top: 20% !important;
+  }
+
+  .board-node[data-location-id="mengxia"],
+  .board-target[data-board-target="mengxia"] {
+    left: 82% !important;
+    top: 50% !important;
+  }
+
+  .board-node[data-location-id="zhuluo"],
+  .board-target[data-board-target="zhuluo"] {
+    left: 18% !important;
+    top: 50% !important;
+  }
+
+  .board-node[data-location-id="madou"],
+  .board-target[data-board-target="madou"] {
+    left: 50% !important;
+    top: 80% !important;
+  }
+
+  .board-node[data-location-id="center"],
+  .board-target[data-board-target="center"] {
+    left: 50% !important;
+    top: 50% !important;
+  }
+
+  /* The four location cards scale down as a group rather than changing topology. */
+  .board-node--location {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: visible !important;
+  }
+
+  .board-node__card-wrap,
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: min(22vw, 94px) !important;
+    max-width: 94px !important;
+    min-width: 0 !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    aspect-ratio: 2154 / 3326 !important;
+    min-height: 0 !important;
+    padding: 5px !important;
+    font-size: 8px !important;
+  }
+
+  /* Closed-location name stays inside its own slot so labels never collide. */
+  .board-node--location:not(.is-opened) .board-node__title {
+    display: block !important;
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 6px !important;
+    width: calc(100% - 8px) !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    padding: 2px 3px !important;
+    text-align: center !important;
+    font-size: 8px !important;
+    line-height: 1.05 !important;
+    color: #e8cf94 !important;
+    background: rgba(3, 24, 29, .76) !important;
+    border-radius: 3px !important;
+    pointer-events: none !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    display: none !important;
+  }
+
+  /* Smaller center core, same meaning and same position as desktop. */
+  .board-node--center {
+    width: min(31vw, 124px) !important;
+    min-width: 0 !important;
+    max-width: 124px !important;
+    min-height: 52px !important;
+    padding: 5px 7px !important;
+    gap: 1px !important;
+    z-index: 4 !important;
+  }
+
+  .board-node--center .board-node__title {
+    font-size: 12px !important;
+    line-height: 1.05 !important;
+  }
+
+  .board-node--center .board-node__subtitle {
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+
+  .board-target {
+    width: min(25vw, 102px) !important;
+    height: min(39vw, 158px) !important;
+    max-width: 102px !important;
+    max-height: 158px !important;
+  }
+
+  .board-target--center {
+    width: min(34vw, 132px) !important;
+    height: 66px !important;
+    max-width: 132px !important;
+  }
+
+  /* JS already offsets stacked tokens. Remove the old per-player mobile margins. */
+  .player-token--human,
+  .player-token--ai1,
+  .player-token--ai2 {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .board-wrap {
+    height: clamp(350px, 110vw, 410px) !important;
+    min-height: 350px !important;
+  }
+
+  .board-node__card-wrap,
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: min(21.5vw, 86px) !important;
+    max-width: 86px !important;
+  }
+
+  .board-node--center {
+    width: min(30vw, 112px) !important;
+    max-width: 112px !important;
+    min-height: 48px !important;
+  }
+
+  .board-node--center .board-node__title {
+    font-size: 11px !important;
+  }
+}
