@@ -1,6 +1,6 @@
 [package]
 name = "jiaqing-game"
-version = "1.0.0"
+version = "1.0.1"
 description = "嘉庆君游台湾：御前争霸"
 authors = ["Red Seed Media"]
 edition = "2021"
