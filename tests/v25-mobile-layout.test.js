@@ -2,13 +2,23 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const layout = require('../src/v25-mobile-layout.js');
 
-test('mobile location cards occupy a 2x2 top grid and center sits below', () => {
+test('mobile board preserves desktop cross topology around the center', () => {
   const p = layout.MOBILE_BOARD_SLOTS;
-  assert.ok(p.tainan.y < p.zhuluo.y);
-  assert.ok(p.mengxia.y < p.madou.y);
-  assert.ok(p.tainan.x < p.mengxia.x);
-  assert.ok(p.zhuluo.x < p.madou.x);
-  assert.ok(p.center.y > p.zhuluo.y && p.center.y > p.madou.y);
+
+  assert.equal(p.center.x, 50);
+  assert.equal(p.center.y, 50);
+
+  assert.equal(p.tainan.x, p.center.x);
+  assert.ok(p.tainan.y < p.center.y);
+
+  assert.equal(p.madou.x, p.center.x);
+  assert.ok(p.madou.y > p.center.y);
+
+  assert.equal(p.zhuluo.y, p.center.y);
+  assert.ok(p.zhuluo.x < p.center.x);
+
+  assert.equal(p.mengxia.y, p.center.y);
+  assert.ok(p.mengxia.x > p.center.x);
 });
 
 test('mobile ordering keeps play area and hand ahead of information rails', () => {
