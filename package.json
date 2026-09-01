@@ -11,6 +11,7 @@
     "desktop:build:universal": "npm run desktop:icons && tauri build --bundles app,dmg --target universal-apple-darwin"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.11.4"
+    "@tauri-apps/cli": "2.11.4",
+    "esbuild": "0.25.9"
   }
 }
