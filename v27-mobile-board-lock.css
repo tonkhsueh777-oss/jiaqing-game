@@ -1,0 +1,28 @@
+/* V27 mobile board coordinate lock.
+   Presentation only. Mobile coordinates are CSS-owned so desktop board JS cannot displace them. */
+@media (max-width: 768px) {
+  .board-node[data-location-id="tainan"],
+  .board-target[data-board-target="tainan"] { left: 28% !important; top: 21% !important; }
+
+  .board-node[data-location-id="mengxia"],
+  .board-target[data-board-target="mengxia"] { left: 72% !important; top: 21% !important; }
+
+  .board-node[data-location-id="zhuluo"],
+  .board-target[data-board-target="zhuluo"] { left: 28% !important; top: 58% !important; }
+
+  .board-node[data-location-id="madou"],
+  .board-target[data-board-target="madou"] { left: 72% !important; top: 58% !important; }
+
+  .board-node[data-location-id="center"],
+  .board-target[data-board-target="center"] { left: 50% !important; top: 87% !important; }
+
+  .player-token[data-position="tainan"] { left: 28% !important; top: 21% !important; }
+  .player-token[data-position="mengxia"] { left: 72% !important; top: 21% !important; }
+  .player-token[data-position="zhuluo"] { left: 28% !important; top: 58% !important; }
+  .player-token[data-position="madou"] { left: 72% !important; top: 58% !important; }
+  .player-token[data-position="center"] { left: 50% !important; top: 87% !important; }
+
+  .player-token--human { margin-left: -12px !important; margin-top: -8px !important; }
+  .player-token--ai1 { margin-left: 12px !important; margin-top: -8px !important; }
+  .player-token--ai2 { margin-left: 0 !important; margin-top: 12px !important; }
+}
