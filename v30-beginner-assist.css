@@ -92,7 +92,6 @@
 html.beginner-assist-off .guide-panel,
 html.beginner-assist-off .card-tooltip,
 html.beginner-assist-off .human-actions .action-hint,
-html.beginner-assist-off .hand-side-note,
 html.beginner-assist-off .selected-card-preview > p,
 html.beginner-assist-off .preview-empty > p {
   display: none !important;
