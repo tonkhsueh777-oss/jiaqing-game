@@ -1,7 +1,7 @@
 {
   "name": "jiaqing-game-desktop",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "desktop:stage": "node scripts/build-desktop-dist.mjs",
