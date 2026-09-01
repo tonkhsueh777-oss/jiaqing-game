@@ -1,0 +1,136 @@
+/* V30 beginner assist: presentation-only teaching layer. */
+.operation-panel .panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.beginner-assist-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 7px;
+  border: 1px solid rgba(220, 184, 100, .5);
+  border-radius: 999px;
+  background: rgba(4, 31, 36, .82);
+  color: #d8c18b;
+  font: inherit;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.beginner-assist-toggle:hover,
+.beginner-assist-toggle:focus-visible {
+  border-color: rgba(239, 207, 130, .9);
+  outline: none;
+}
+
+.beginner-assist-toggle__track {
+  position: relative;
+  width: 30px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(120, 130, 130, .35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  transition: background .18s ease;
+}
+
+.beginner-assist-toggle__thumb {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #b7b8b2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+  transition: transform .18s ease, background .18s ease;
+}
+
+.beginner-assist-toggle.is-on .beginner-assist-toggle__track {
+  background: rgba(188, 145, 49, .65);
+}
+
+.beginner-assist-toggle.is-on .beginner-assist-toggle__thumb {
+  transform: translateX(14px);
+  background: #f0d38b;
+}
+
+.beginner-assist-toggle strong {
+  min-width: 1em;
+  color: #efd087;
+  font-size: 10px;
+}
+
+.beginner-extra-help {
+  margin-top: 8px;
+  padding: 8px 9px;
+  border: 1px solid rgba(224, 187, 102, .34);
+  border-radius: 7px;
+  background: rgba(177, 132, 37, .08);
+}
+
+.beginner-extra-help strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #efd38b;
+  font-size: 10px;
+}
+
+.beginner-extra-help p {
+  margin: 0;
+  color: #d8c9a6;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+html.beginner-assist-off .guide-panel,
+html.beginner-assist-off .card-tooltip,
+html.beginner-assist-off .human-actions .action-hint,
+html.beginner-assist-off .hand-side-note,
+html.beginner-assist-off .selected-card-preview > p,
+html.beginner-assist-off .preview-empty > p {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .beginner-assist-toggle {
+    min-height: 30px;
+    font-size: 10px;
+    padding-inline: 6px;
+  }
+
+  .beginner-assist-toggle__label {
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .beginner-extra-help {
+    margin: 7px 8px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .operation-panel .panel-heading {
+    gap: 6px;
+  }
+
+  .beginner-assist-toggle {
+    gap: 4px;
+    padding: 3px 5px;
+  }
+
+  .beginner-assist-toggle__track {
+    width: 28px;
+  }
+
+  .beginner-assist-toggle.is-on .beginner-assist-toggle__thumb {
+    transform: translateX(12px);
+  }
+}
