@@ -77,7 +77,7 @@ body.desktop-mode .game-shell {
     calc(var(--desktop-parallax-y) * 3px),
     0
   );
-  transition: transform 130ms linear;
+  transition: transform 130ms linear, filter 220ms ease, opacity 220ms ease;
 }
 
 body.desktop-mode .dashboard-panel,
@@ -125,6 +125,114 @@ body.desktop-mode .pile-card.desktop-card-hover {
   transform: translateY(-5px) translateZ(12px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
 }
 
+/* Desktop draw cinematic: reuse V22 mechanics, increase depth and focus only. */
+body.desktop-mode.desktop-draw-cinematic-active .game-shell {
+  filter: brightness(.58) saturate(.78) blur(.25px);
+  transform: translate3d(0, 4px, -18px) scale(.992);
+}
+
+body.desktop-mode .draw-ritual-overlay {
+  perspective: 1600px;
+  background: radial-gradient(circle at 50% 42%, rgba(214, 169, 79, .09), rgba(1, 7, 9, .78) 58%, rgba(0, 0, 0, .9));
+}
+
+body.desktop-mode .draw-ritual-stage {
+  transform-style: preserve-3d;
+  transform: translateZ(22px);
+}
+
+body.desktop-mode .draw-ritual-stack {
+  transform: translateZ(-28px) rotateX(4deg);
+  filter: drop-shadow(0 28px 30px rgba(0, 0, 0, .52));
+}
+
+body.desktop-mode .draw-ritual-card {
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 30px 34px rgba(0, 0, 0, .48));
+}
+
+body.desktop-mode .draw-ritual-card__inner,
+body.desktop-mode .draw-ritual-card__face {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+body.desktop-mode .draw-ritual-card.is-dragging {
+  filter: drop-shadow(0 38px 42px rgba(0, 0, 0, .58)) drop-shadow(0 0 22px rgba(226, 185, 94, .12));
+}
+
+body.desktop-mode .draw-ritual-card.is-committed {
+  filter: drop-shadow(0 42px 46px rgba(0, 0, 0, .6)) drop-shadow(0 0 28px rgba(239, 199, 104, .25));
+}
+
+/* Desktop treasure cinematic: keep V23 human-only trigger, upgrade presentation. */
+body.desktop-mode .v23-treasure-fx__shade {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(224, 178, 75, .16), transparent 26%),
+    linear-gradient(180deg, rgba(2, 12, 14, .82), rgba(0, 4, 5, .94));
+  backdrop-filter: blur(5px) saturate(.72);
+}
+
+body.desktop-mode .v23-treasure-fx__content {
+  perspective: 1600px;
+  gap: 13px;
+  transform: translateY(-2vh) translateZ(30px);
+}
+
+body.desktop-mode .v23-treasure-fx__card {
+  width: clamp(190px, 18vw, 270px);
+  animation: desktopTreasureReveal 1.05s cubic-bezier(.12,.86,.18,1) both;
+  filter: drop-shadow(0 42px 50px rgba(0, 0, 0, .62));
+}
+
+body.desktop-mode .v23-treasure-fx__card img {
+  border-width: 2px;
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, .64),
+    0 0 0 5px rgba(171, 123, 39, .13),
+    0 0 58px rgba(235, 194, 96, .36);
+}
+
+body.desktop-mode .v23-treasure-fx__halo {
+  width: 175%;
+  box-shadow:
+    0 0 38px rgba(240, 199, 104, .34),
+    0 0 90px rgba(224, 169, 66, .16),
+    inset 0 0 46px rgba(240, 199, 104, .2);
+}
+
+body.desktop-mode .v23-treasure-fx__burst {
+  width: min(72vw, 760px);
+  opacity: .9;
+  filter: blur(.4px);
+}
+
+body.desktop-mode .v23-treasure-fx__name {
+  font-size: clamp(30px, 2.7vw, 46px);
+  text-shadow: 0 4px 22px rgba(0, 0, 0, .9), 0 0 28px rgba(212, 161, 58, .35);
+}
+
+@keyframes desktopTreasureReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) translateZ(-80px) rotateY(68deg) rotateX(7deg) scale(.68);
+    filter: blur(7px);
+  }
+  52% {
+    opacity: 1;
+    transform: translateY(-8px) translateZ(28px) rotateY(-8deg) rotateX(-1deg) scale(1.055);
+    filter: blur(0);
+  }
+  76% {
+    transform: translateY(-3px) translateZ(20px) rotateY(5deg) rotateX(1deg) scale(1.025);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateZ(18px) rotateY(0) rotateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 body.desktop-mode.reduced-motion .desktop-bg-depth,
 body.desktop-mode.reduced-motion .game-shell {
   transform: none;
@@ -134,6 +242,10 @@ body.desktop-mode.reduced-motion .game-shell {
 body.desktop-mode.reduced-motion .desktop-card-hover {
   transform: translateY(-4px);
   filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .22));
+}
+
+body.desktop-mode.reduced-motion .v23-treasure-fx__card {
+  animation-duration: .001ms !important;
 }
 
 @media (max-width: 900px) {
