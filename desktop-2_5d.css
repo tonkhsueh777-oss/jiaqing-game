@@ -1,0 +1,143 @@
+:root {
+  --desktop-parallax-x: 0;
+  --desktop-parallax-y: 0;
+}
+
+.desktop-scene-layer {
+  display: none;
+}
+
+body.desktop-mode {
+  overflow: hidden;
+  background: #071012;
+  perspective: 1400px;
+}
+
+body.desktop-mode .desktop-scene-layer {
+  display: block;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(231, 192, 112, .11), transparent 36%),
+    linear-gradient(180deg, #102125 0%, #071315 54%, #040a0b 100%);
+}
+
+body.desktop-mode .desktop-bg-depth {
+  position: absolute;
+  inset: -5%;
+  will-change: transform;
+  transition: transform 140ms linear;
+}
+
+body.desktop-mode .desktop-bg-depth--far {
+  opacity: .65;
+  background:
+    radial-gradient(circle at 16% 20%, rgba(179, 58, 43, .12), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(206, 157, 74, .09), transparent 22%);
+  transform: translate3d(
+    calc(var(--desktop-parallax-x) * -5px),
+    calc(var(--desktop-parallax-y) * -4px),
+    0
+  ) scale(1.03);
+}
+
+body.desktop-mode .desktop-bg-depth--mid {
+  opacity: .52;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 12%, rgba(236, 204, 139, .025) 12.2% 12.5%, transparent 12.7% 25%);
+  transform: translate3d(
+    calc(var(--desktop-parallax-x) * -9px),
+    calc(var(--desktop-parallax-y) * -7px),
+    0
+  );
+}
+
+body.desktop-mode .desktop-fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .7;
+}
+
+body.desktop-mode .game-shell,
+body.desktop-mode #toast,
+body.desktop-mode #modal-root {
+  position: relative;
+  z-index: 1;
+}
+
+body.desktop-mode .game-shell {
+  transform-style: preserve-3d;
+  transform: translate3d(
+    calc(var(--desktop-parallax-x) * 4px),
+    calc(var(--desktop-parallax-y) * 3px),
+    0
+  );
+  transition: transform 130ms linear;
+}
+
+body.desktop-mode .dashboard-panel,
+body.desktop-mode .board-stage,
+body.desktop-mode .hand-dashboard {
+  transform-style: preserve-3d;
+}
+
+body.desktop-mode [data-card-id],
+body.desktop-mode .pile-card,
+body.desktop-mode .location-card-on-board {
+  position: relative;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, filter;
+  transition: transform 180ms cubic-bezier(.2,.8,.2,1), filter 180ms ease, box-shadow 180ms ease;
+}
+
+body.desktop-mode [data-card-id]::after,
+body.desktop-mode .pile-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px -3px -5px 3px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(145deg, rgba(242, 210, 145, .18), rgba(15, 8, 5, .46));
+  transform: translateZ(-7px);
+  opacity: .72;
+}
+
+body.desktop-mode .desktop-card-hover {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: translateY(-10px) translateZ(18px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .28)) brightness(1.035);
+  z-index: 15;
+}
+
+body.desktop-mode .board-node.is-opened .location-card-on-board.desktop-card-hover {
+  transform: translateZ(14px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.025);
+}
+
+body.desktop-mode .pile-card.desktop-card-hover {
+  transform: translateY(-5px) translateZ(12px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+}
+
+body.desktop-mode.reduced-motion .desktop-bg-depth,
+body.desktop-mode.reduced-motion .game-shell {
+  transform: none;
+  transition: none;
+}
+
+body.desktop-mode.reduced-motion .desktop-card-hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .22));
+}
+
+@media (max-width: 900px) {
+  body.desktop-mode .desktop-card-hover {
+    transform: translateY(-4px);
+  }
+}
