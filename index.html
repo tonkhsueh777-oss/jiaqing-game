@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="v28-mobile-cross-board.css?v=29">
   <link rel="stylesheet" href="v30-beginner-assist.css?v=30">
   <link rel="stylesheet" href="desktop-2_5d.css?v=31">
+  <link rel="stylesheet" href="desktop-ai.css?v=31">
 </head>
 <body>
   <div id="desktop-scene-layer" class="desktop-scene-layer" aria-hidden="true">
@@ -144,21 +145,12 @@
   <script src="src/v22-draw-ritual-ui.js?v=22"></script>
   <script src="src/desktop-draw-cinematic.js?v=31"></script>
   <script src="src/desktop-treasure-cinematic.js?v=31"></script>
-  <script>
-    if (document.body.classList.contains('desktop-mode')) {
-      window.JQGame?.DesktopDrawCinematic?.install(window.JQGame?.UI, document);
-    }
-  </script>
   <script src="src/v23-visual-effects.js?v=23"></script>
   <script src="src/v25-mobile-ui.js?v=29"></script>
   <script src="src/v30-beginner-assist-ui.js?v=30"></script>
-  <script>
-    if (document.body.classList.contains('desktop-mode')) {
-      const reducedMotion = document.body.classList.contains('reduced-motion');
-      window.JQGame?.DesktopScene?.init({ root: document.documentElement, document, window, reducedMotion });
-      window.JQGame?.DesktopCardMotion?.bind(document.getElementById('app'), { reducedMotion });
-    }
-  </script>
+  <script src="src/desktop-audio.js?v=31"></script>
+  <script src="src/desktop-ai-cinematic.js?v=31"></script>
+  <script src="src/desktop-init.js?v=31"></script>
   <script src="src/main.js?v=22"></script>
 </body>
 </html>
