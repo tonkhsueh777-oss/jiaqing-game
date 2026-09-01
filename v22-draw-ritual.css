@@ -1,0 +1,57 @@
+/* V22 draw ritual: tactile draw, reveal, and hand-entry ceremony. */
+#draw-ritual-root { position: relative; z-index: 9999; }
+.draw-ritual-active { overscroll-behavior: none; }
+.draw-ritual-overlay {
+  position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
+  background: rgba(0, 10, 14, .58); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  touch-action: none; user-select: none;
+}
+.draw-ritual-vignette { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 150px rgba(0,0,0,.74); }
+.draw-ritual-stage {
+  position: relative; width: min(92vw, 520px); min-height: 520px; display: grid; justify-items: center; align-content: center;
+  perspective: 1100px;
+}
+.draw-ritual-title {
+  position: absolute; top: 34px; color: #efcf82; font: 700 20px/1.2 "STKaiti","KaiTi",serif; letter-spacing: .16em;
+  text-shadow: 0 2px 12px rgba(0,0,0,.8);
+}
+.draw-ritual-stack { position: absolute; width: 170px; height: 263px; transform: translateY(52px); opacity: .72; }
+.draw-ritual-stack img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 1px solid rgba(224,183,94,.38); box-shadow: 0 16px 35px rgba(0,0,0,.48); }
+.draw-ritual-stack img:nth-child(1) { transform: translate(7px, 8px) rotate(1.4deg); opacity: .45; }
+.draw-ritual-stack img:nth-child(2) { transform: translate(3px, 4px) rotate(.5deg); opacity: .72; }
+.draw-ritual-card {
+  --ritual-lift: 0px; --ritual-tilt: 0deg; --ritual-progress: 0;
+  position: relative; width: 174px; aspect-ratio: 2154 / 3326; cursor: grab;
+  transform: translateY(calc(52px - var(--ritual-lift))) rotate(var(--ritual-tilt));
+  transform-style: preserve-3d;
+  transition: transform 90ms linear, filter 180ms ease;
+  filter: drop-shadow(0 20px 24px rgba(0,0,0,.55));
+  outline: none;
+}
+.draw-ritual-card.is-dragging { cursor: grabbing; transition: filter 120ms ease; }
+.draw-ritual-card.is-committed { filter: drop-shadow(0 20px 28px rgba(0,0,0,.58)) drop-shadow(0 0 18px rgba(239,207,130,.38)); }
+.draw-ritual-card.is-snapping-back { transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.draw-ritual-card__inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 520ms cubic-bezier(.2,.75,.18,1); }
+.draw-ritual-card.is-revealing .draw-ritual-card__inner, .draw-ritual-card.is-revealed .draw-ritual-card__inner { transform: rotateY(180deg); }
+.draw-ritual-card__face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 10px; overflow: hidden; border: 1px solid rgba(232,194,105,.72); background: #071b20; box-shadow: inset 0 0 0 1px rgba(255,255,255,.05); }
+.draw-ritual-card__face img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.draw-ritual-card__front { transform: rotateY(180deg); }
+.draw-ritual-glint { position: absolute; inset: 2px; border-radius: 9px; pointer-events: none; overflow: hidden; }
+.draw-ritual-glint::after { content: ""; position: absolute; top: -35%; left: -85%; width: 48%; height: 170%; transform: rotate(18deg); background: linear-gradient(90deg, transparent, rgba(255,236,180,.42), transparent); opacity: calc(.18 + var(--ritual-progress) * .65); transition: opacity 80ms linear; }
+.draw-ritual-card.is-committed .draw-ritual-glint::after { animation: ritualGlint 900ms ease-in-out infinite; }
+.draw-ritual-meter { width: 180px; height: 4px; margin-top: 92px; border-radius: 999px; overflow: hidden; background: rgba(239,207,130,.13); border: 1px solid rgba(239,207,130,.22); }
+.draw-ritual-meter span { display:block; width: calc(var(--ritual-progress, 0) * 100%); height:100%; background: linear-gradient(90deg,#8a6a2e,#efcf82); box-shadow: 0 0 10px rgba(239,207,130,.45); transition: width 80ms linear; }
+.draw-ritual-prompt { margin-top: 13px; color: #f0d79b; font-weight: 800; font-size: 15px; letter-spacing: .06em; min-height: 22px; }
+.draw-ritual-subprompt { margin-top: 5px; color: #bbaa86; font-size: 10px; }
+@keyframes ritualGlint { 0% { transform: translateX(0) rotate(18deg); } 100% { transform: translateX(420%) rotate(18deg); } }
+@media (max-width: 620px) {
+  .draw-ritual-stage { min-height: 460px; }
+  .draw-ritual-title { top: 28px; font-size: 17px; }
+  .draw-ritual-card { width: 154px; }
+  .draw-ritual-stack { width: 150px; height: 232px; }
+  .draw-ritual-meter { width: 158px; margin-top: 82px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .draw-ritual-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .draw-ritual-card, .draw-ritual-card__inner, .draw-ritual-meter span { transition-duration: .01ms !important; animation: none !important; }
+}
