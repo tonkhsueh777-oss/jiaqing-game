@@ -6,6 +6,13 @@
   const baseSetInteractionMode = game.UI.setInteractionMode.bind(game.UI);
   let lastState = null;
 
+  const TREASURE_SYMBOLS = {
+    goldSeal: '印',
+    sword: '剑',
+    gun: '枪',
+    pomelo: '柚'
+  };
+
   const escapeHtml = value => String(value ?? '').replace(/[&<>'\"]/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
   }[ch]));
@@ -18,9 +25,10 @@
   function treasureRows(player) {
     return `<div class="overview-player__treasures">${Object.values(game.TREASURES).map(t => {
       const count = player.treasures[t.id] || 0;
-      return `<div class="overview-player__treasure ${count > 0 ? 'has-treasure' : 'no-treasure'}" title="${escapeHtml(t.name)} ×${count}">
-        <img src="${escapeHtml(t.asset)}" alt="${escapeHtml(t.shortName || t.name)}">
-        <span>${escapeHtml(t.shortName || t.name)}</span>
+      const symbol = TREASURE_SYMBOLS[t.id] || '宝';
+      return `<div class="overview-player__treasure overview-player__treasure--${escapeHtml(t.id)} ${count > 0 ? 'has-treasure' : 'no-treasure'}" title="${escapeHtml(t.name)} ×${count}">
+        <span class="treasure-status-icon" aria-hidden="true">${symbol}</span>
+        <span class="treasure-status-name">${escapeHtml(t.shortName || t.name)}</span>
         <strong>×${count}</strong>
       </div>`;
     }).join('')}</div>`;
