@@ -142,6 +142,13 @@
   <script src="src/v15-board-ui.js?v=17"></script>
   <script src="src/v18-left-ui.js?v=21"></script>
   <script src="src/v22-draw-ritual-ui.js?v=22"></script>
+  <script src="src/desktop-draw-cinematic.js?v=31"></script>
+  <script src="src/desktop-treasure-cinematic.js?v=31"></script>
+  <script>
+    if (document.body.classList.contains('desktop-mode')) {
+      window.JQGame?.DesktopDrawCinematic?.install(window.JQGame?.UI, document);
+    }
+  </script>
   <script src="src/v23-visual-effects.js?v=23"></script>
   <script src="src/v25-mobile-ui.js?v=29"></script>
   <script src="src/v30-beginner-assist-ui.js?v=30"></script>
