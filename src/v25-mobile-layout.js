@@ -4,11 +4,11 @@
   if (root && root.JQGame) root.JQGame.MobileLayout = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   const MOBILE_BOARD_SLOTS = Object.freeze({
-    tainan: Object.freeze({ x: 28, y: 21 }),
-    mengxia: Object.freeze({ x: 72, y: 21 }),
-    zhuluo: Object.freeze({ x: 28, y: 58 }),
-    madou: Object.freeze({ x: 72, y: 58 }),
-    center: Object.freeze({ x: 50, y: 87 })
+    center: Object.freeze({ x: 50, y: 50 }),
+    tainan: Object.freeze({ x: 50, y: 20 }),
+    mengxia: Object.freeze({ x: 82, y: 50 }),
+    zhuluo: Object.freeze({ x: 18, y: 50 }),
+    madou: Object.freeze({ x: 50, y: 80 })
   });
 
   const MOBILE_SECTION_ORDER = Object.freeze(['main', 'hand', 'right', 'left']);
