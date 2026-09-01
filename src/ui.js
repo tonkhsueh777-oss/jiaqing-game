@@ -107,7 +107,7 @@
     const opened = !isCenter && state.openedLocations[locationId];
     const pointStyle = boardStyle(point);
     if (isCenter) {
-      return `<div class="board-node board-node--center" style="${pointStyle}">
+      return `<div class="board-node board-node--center" data-location-id="center" style="${pointStyle}">
         <div class="board-node__title">中央起点</div>
         <div class="board-node__subtitle">巡游中转枢纽</div>
       </div>`;
@@ -115,7 +115,7 @@
 
     if (opened) {
       const card = state.locationCards[locationId] || { asset: game.LOCATIONS[locationId].asset, name: game.LOCATIONS[locationId].name };
-      return `<div class="board-node board-node--location is-opened" style="${pointStyle}">
+      return `<div class="board-node board-node--location is-opened" data-location-id="${locationId}" style="${pointStyle}">
         <div class="board-node__card-wrap">
           <img class="location-card-on-board" src="${card.asset}" alt="${escapeHtml(card.name || game.LOCATIONS[locationId].name)}">
         </div>
@@ -124,7 +124,7 @@
       </div>`;
     }
 
-    return `<div class="board-node board-node--location" style="${pointStyle}">
+    return `<div class="board-node board-node--location" data-location-id="${locationId}" style="${pointStyle}">
       <div class="board-slot-empty">待开放地牌</div>
       <div class="board-node__title">${escapeHtml(locationName(locationId))}</div>
       <div class="board-node__subtitle">${escapeHtml(locationSubtitle(locationId))}</div>
@@ -154,7 +154,7 @@
       players.forEach((player, index) => {
         const offset = tokenOffset(index, players.length);
         const label = player.id === 'human' ? '我' : player.id === 'ai1' ? '甲' : '乙';
-        html += `<div class="player-token player-token--${player.id}" style="left:calc(${point.x}% + ${offset.x}px);top:calc(${point.y}% + ${offset.y}px);" title="${escapeHtml(player.name)}">${label}</div>`;
+        html += `<div class="player-token player-token--${player.id}" data-position="${position}" style="left:calc(${point.x}% + ${offset.x}px);top:calc(${point.y}% + ${offset.y}px);" title="${escapeHtml(player.name)}">${label}</div>`;
       });
     }
 
