@@ -5,9 +5,10 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "desktop:stage": "node scripts/build-desktop-dist.mjs",
+    "desktop:icons": "tauri icon assets/app-icon-source.png",
     "desktop:dev": "npm run desktop:stage && tauri dev",
-    "desktop:build": "tauri build --bundles app,dmg",
-    "desktop:build:universal": "tauri build --bundles app,dmg --target universal-apple-darwin"
+    "desktop:build": "npm run desktop:icons && tauri build --bundles app,dmg",
+    "desktop:build:universal": "npm run desktop:icons && tauri build --bundles app,dmg --target universal-apple-darwin"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.11.4"
