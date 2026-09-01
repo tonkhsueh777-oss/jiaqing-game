@@ -1,0 +1,411 @@
+/* V25 mobile responsive layout.
+   Mobile presentation only: rules, deck, card art and desktop layout are unchanged.
+   Reading order on phones: 4-location play area -> human hand -> current operation -> other information. */
+
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    height: auto !important;
+    min-height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .game-shell {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 6px !important;
+    overflow: visible !important;
+  }
+
+  .main-dashboard,
+  .right-dashboard,
+  .left-dashboard {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* 1. Main play area first. */
+  .main-dashboard {
+    order: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .top-dashboard-row {
+    display: none !important;
+  }
+
+  .board-stage {
+    order: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 5px !important;
+    overflow: hidden !important;
+  }
+
+  .board-wrap {
+    width: 100% !important;
+    height: clamp(430px, 118vw, 500px) !important;
+    min-height: 430px !important;
+    overflow: hidden !important;
+  }
+
+  .board-overlay {
+    transform: none !important;
+  }
+
+  /* Mobile uses a 2x2 location-card field with the center below it. */
+  .board-cross {
+    display: none !important;
+  }
+
+  .board-node--location {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .board-node__card-wrap {
+    width: min(31vw, 112px) !important;
+    max-width: 112px !important;
+    padding: 2px !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: min(31vw, 112px) !important;
+    max-width: 112px !important;
+    min-height: 0 !important;
+    padding: 6px !important;
+    font-size: 9px !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title {
+    display: block !important;
+    position: absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: calc(100% + 4px) !important;
+    width: 118px !important;
+    transform: translateX(-50%) !important;
+    text-align: center !important;
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__subtitle {
+    display: none !important;
+  }
+
+  .board-node--center {
+    width: min(46vw, 170px) !important;
+    min-width: 0 !important;
+    max-width: 170px !important;
+    min-height: 60px !important;
+    padding: 6px 9px !important;
+    gap: 2px !important;
+  }
+
+  .board-node--center .board-node__title {
+    font-size: 14px !important;
+  }
+
+  .board-node--center .board-node__subtitle {
+    font-size: 8px !important;
+  }
+
+  .board-target {
+    width: min(34vw, 124px) !important;
+    height: min(54vw, 190px) !important;
+    touch-action: manipulation;
+  }
+
+  .board-target--center {
+    width: min(50vw, 180px) !important;
+    height: 78px !important;
+  }
+
+  .player-token {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 9px !important;
+    border-width: 1.5px !important;
+  }
+
+  /* 2. Human hand immediately under the board. */
+  .hand-dashboard {
+    order: 2 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .hand-heading {
+    min-height: 34px !important;
+    font-size: 15px !important;
+  }
+
+  .human-panel {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .hand-zone {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 8px 4px 10px !important;
+    overflow: visible !important;
+  }
+
+  .hand-card-button {
+    flex: 0 0 auto !important;
+    width: min(29vw, 112px) !important;
+    max-width: 112px !important;
+    max-height: none !important;
+    margin: 0 !important;
+    transform: none;
+    touch-action: manipulation;
+  }
+
+  .hand-card-button.is-selected {
+    transform: translateY(-4px) scale(1.018) !important;
+  }
+
+  .hand-side-note {
+    display: none !important;
+  }
+
+  .card-tooltip {
+    width: min(250px, 86vw) !important;
+    max-width: 86vw !important;
+    font-size: 10px !important;
+    line-height: 1.4 !important;
+    z-index: 50 !important;
+  }
+
+  /* 3. Current operation, buttons, then guide. */
+  .right-dashboard {
+    order: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .operation-panel {
+    order: 1 !important;
+    min-height: 0 !important;
+  }
+
+  .controls-panel {
+    order: 2 !important;
+    margin-top: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .guide-panel {
+    order: 3 !important;
+    min-height: 0 !important;
+  }
+
+  .selected-card-preview {
+    min-height: 0 !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(96px, 112px) minmax(0, 1fr) !important;
+    align-items: center !important;
+    justify-items: start !important;
+    gap: 7px 10px !important;
+    padding: 8px !important;
+  }
+
+  .preview-card-wrap {
+    width: 108px !important;
+    max-width: 30vw !important;
+    grid-row: 1 / span 2 !important;
+  }
+
+  .selected-card-preview > strong,
+  .selected-card-preview > p {
+    min-width: 0;
+    text-align: left !important;
+  }
+
+  .preview-empty {
+    grid-column: 1 / -1 !important;
+    min-height: 126px !important;
+    height: auto !important;
+    padding: 10px !important;
+  }
+
+  .preview-empty__mark {
+    width: 58px !important;
+    height: 82px !important;
+    font-size: 27px !important;
+  }
+
+  .action-controls {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 7px !important;
+    padding: 8px !important;
+    height: auto !important;
+  }
+
+  .action-controls .action-button,
+  .left-actions .ghost-button {
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 8px 9px !important;
+    font-size: 13px !important;
+    touch-action: manipulation;
+  }
+
+  .action-guide {
+    padding: 9px 10px 10px !important;
+    font-size: 10px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 4. Supporting information follows below the play flow. */
+  .left-dashboard {
+    order: 3 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .brand-block {
+    order: 1 !important;
+    min-height: 0 !important;
+    padding: 10px 12px !important;
+  }
+
+  .brand-block h1 {
+    font-size: 21px !important;
+  }
+
+  .round-panel { order: 2 !important; }
+  .players-overview-panel { order: 3 !important; }
+  .treasure-overview-panel { order: 4 !important; }
+  .pile-info-panel { order: 5 !important; }
+  .game-log { order: 6 !important; }
+  .left-actions { order: 7 !important; margin-top: 0 !important; }
+
+  .turn-banner {
+    min-height: 48px !important;
+    margin: 7px !important;
+    font-size: 14px !important;
+  }
+
+  .game-log {
+    min-height: 150px !important;
+    height: auto !important;
+  }
+
+  .log-lines {
+    max-height: 180px !important;
+    height: auto !important;
+  }
+
+  .left-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 7px !important;
+  }
+
+  .modal-root.is-open {
+    padding: 12px !important;
+  }
+
+  .modal {
+    width: min(620px, 96vw) !important;
+    max-height: 88vh !important;
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .game-shell {
+    padding: 4px !important;
+    gap: 6px !important;
+  }
+
+  .board-stage,
+  .hand-dashboard,
+  .right-dashboard,
+  .left-dashboard {
+    border-radius: 8px;
+  }
+
+  .board-wrap {
+    height: 430px !important;
+    min-height: 430px !important;
+  }
+
+  .board-node__card-wrap,
+  .board-node--location:not(.is-opened) .board-slot-empty {
+    width: min(31vw, 100px) !important;
+  }
+
+  .board-node--location:not(.is-opened) .board-node__title {
+    width: 104px !important;
+    font-size: 10px !important;
+  }
+
+  .hand-zone {
+    gap: 5px !important;
+    padding-inline: 2px !important;
+  }
+
+  .hand-card-button {
+    width: min(29.5vw, 100px) !important;
+  }
+
+  .selected-card-preview {
+    grid-template-columns: 92px minmax(0, 1fr) !important;
+  }
+
+  .preview-card-wrap {
+    width: 88px !important;
+    max-width: 88px !important;
+  }
+
+  .action-controls {
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (max-width: 768px) {
+  .hand-card-button:hover {
+    transform: translateY(-4px) scale(1.018) !important;
+  }
+}
