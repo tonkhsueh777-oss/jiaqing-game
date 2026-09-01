@@ -1,6 +1,7 @@
 (function (root) {
   const game = root.JQGame;
-  if (!game?.Analytics || typeof document === 'undefined') return;
+  const layout = game?.FeedbackLayout;
+  if (!game?.Analytics || !layout || typeof document === 'undefined') return;
 
   const REASON_LABELS = {
     rules: '规则不容易懂',
@@ -13,6 +14,7 @@
 
   let mounted = false;
   let submitting = false;
+  let resizeTimer = null;
 
   function panelHtml() {
     return `
@@ -32,17 +34,39 @@
       </section>`;
   }
 
+  function targetForViewport() {
+    const width = Number(root.innerWidth) || document.documentElement.clientWidth || 1200;
+    return layout.panelTargetForWidth(width);
+  }
+
+  function placePanel(panel) {
+    const targetName = targetForViewport();
+    if (targetName === 'right') {
+      const right = document.querySelector('.right-dashboard');
+      if (!right) return panel;
+      if (panel.parentElement !== right || panel !== right.lastElementChild) right.appendChild(panel);
+      panel.dataset.feedbackPlacement = 'right';
+      return panel;
+    }
+
+    const left = document.querySelector('.left-dashboard');
+    if (!left) return panel;
+    const actions = left.querySelector('.left-actions');
+    if (panel.parentElement !== left || panel.nextElementSibling !== actions) {
+      left.insertBefore(panel, actions || null);
+    }
+    panel.dataset.feedbackPlacement = 'left';
+    return panel;
+  }
+
   function ensurePanel() {
     let panel = document.querySelector('.analytics-panel');
-    if (panel) return panel;
-    const left = document.querySelector('.left-dashboard');
-    if (!left) return null;
-    const actions = left.querySelector('.left-actions');
-    const holder = document.createElement('div');
-    holder.innerHTML = panelHtml().trim();
-    panel = holder.firstElementChild;
-    left.insertBefore(panel, actions || null);
-    return panel;
+    if (!panel) {
+      const holder = document.createElement('div');
+      holder.innerHTML = panelHtml().trim();
+      panel = holder.firstElementChild;
+    }
+    return placePanel(panel);
   }
 
   async function refresh() {
@@ -126,6 +150,10 @@
     mounted = true;
     panel.querySelector('[data-feedback="like"]')?.addEventListener('click', submitLike);
     panel.querySelector('[data-feedback="dislike"]')?.addEventListener('click', openDislikeModal);
+    root.addEventListener?.('resize', () => {
+      root.clearTimeout?.(resizeTimer);
+      resizeTimer = root.setTimeout?.(() => ensurePanel(), 100);
+    });
     refresh();
   }
 
