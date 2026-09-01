@@ -34,6 +34,10 @@
     return gains;
   }
 
+  function shouldShowTreasureGain(gain) {
+    return Boolean(gain && gain.playerId === 'human' && Number(gain.amount || 0) > 0);
+  }
+
   function classifyLog(line) {
     const text = String(line || '');
     if (!text) return null;
@@ -48,5 +52,5 @@
     return null;
   }
 
-  return { snapshotState, detectTreasureGains, classifyLog };
+  return { snapshotState, detectTreasureGains, shouldShowTreasureGain, classifyLog };
 });
