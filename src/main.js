@@ -44,6 +44,13 @@
     game.UI.render(state);
   }
 
+  async function showHumanDraw(cards, interactive = false) {
+    const drawn = Array.isArray(cards) ? cards.filter(Boolean) : [];
+    if (!drawn.length || typeof game.UI.showDrawRitual !== 'function') return;
+    game.saveGame(state);
+    await game.UI.showDrawRitual(drawn, { interactive });
+  }
+
   async function afterHumanAction(result) {
     if (!result?.ok) {
       game.UI.showToast(result?.message || '当前无法执行这个动作。');
@@ -52,6 +59,7 @@
     if (!state.winnerId) {
       const finished = game.completeSingleActionTurn(state);
       const mergedMessage = finished?.ok ? `${result.message} ${finished.message}` : result.message;
+      if (finished?.ok) await showHumanDraw(finished.cards, false);
       resetPending();
       saveAndRender();
       game.UI.showToast(mergedMessage);
@@ -83,6 +91,7 @@
         game.UI.showToast(result.message);
         return;
       }
+      await showHumanDraw(result.cards, true);
       resetPending();
       saveAndRender();
       game.UI.showToast(result.message);
@@ -206,7 +215,7 @@
     if (!state || currentPlayer()?.id !== 'human' || state.phase !== 'action') return;
     pending = { kind: 'pass', runtimeId: null, targetPlayerId: null };
     game.UI.setInteractionMode('choosePassCard', {
-      hint: '本回合不执行其他动作：请选择1张手牌换入弃牌堆。系统会自动补回1张，手牌仍保持3张，然后结束回合。'
+      hint: '本回合不执行其他动作：请选择1张手牌换入弃牌堆。随后按住牌背向上搓出新牌，松手揭牌并结束回合。'
     });
   }
 
@@ -243,7 +252,11 @@
         if (!player) break;
 
         if (state.phase === 'setup' || state.phase === 'turnStart') {
+          const startingPlayerId = player.id;
           const turn = game.beginTurn(state);
+          if (!turn.skipped && startingPlayerId === 'human' && turn.cards?.length) {
+            await showHumanDraw(turn.cards, false);
+          }
           saveAndRender();
           if (turn.skipped) {
             game.UI.showToast(turn.message);
