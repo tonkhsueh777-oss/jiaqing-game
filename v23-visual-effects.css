@@ -1,0 +1,191 @@
+/* V23 visual-only effects. No board/layout/game-rule changes. */
+#v23-treasure-fx-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  pointer-events: none;
+}
+
+.v23-treasure-fx {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.v23-treasure-fx.is-visible { opacity: 1; }
+.v23-treasure-fx.is-leaving { opacity: 0; }
+
+.v23-treasure-fx__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(213,169,72,.10), transparent 30%),
+    rgba(1, 10, 13, .74);
+  backdrop-filter: blur(2px);
+}
+
+.v23-treasure-fx__burst {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: min(66vw, 620px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(245,209,123,.18) 0 2deg, transparent 2deg 14deg),
+    radial-gradient(circle, rgba(238,198,101,.24) 0 14%, rgba(210,157,55,.08) 30%, transparent 62%);
+  filter: blur(.2px);
+  animation: v23TreasureBurst 1.35s cubic-bezier(.2,.72,.2,1) both;
+}
+
+.v23-treasure-fx__content {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  transform: translateY(-1vh);
+  animation: v23TreasureContentIn .58s cubic-bezier(.16,.82,.22,1) both;
+}
+
+.v23-treasure-fx__eyebrow {
+  color: #f1d38a;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: clamp(15px, 1.3vw, 20px);
+  letter-spacing: .34em;
+  text-indent: .34em;
+  text-shadow: 0 2px 12px rgba(0,0,0,.8);
+}
+
+.v23-treasure-fx__card {
+  position: relative;
+  width: clamp(150px, 16vw, 225px);
+  aspect-ratio: 2154 / 3326;
+  transform-style: preserve-3d;
+  animation: v23TreasureCardReveal .78s cubic-bezier(.18,.84,.2,1) both;
+}
+
+.v23-treasure-fx__card img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 7px;
+  border: 1px solid rgba(249, 221, 143, .86);
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.58),
+    0 0 0 4px rgba(171,123,39,.12),
+    0 0 34px rgba(235,194,96,.28);
+}
+
+.v23-treasure-fx__halo {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(248,217,139,.48);
+  box-shadow:
+    0 0 22px rgba(240,199,104,.28),
+    inset 0 0 34px rgba(240,199,104,.18);
+  animation: v23TreasureHalo 1.1s ease-out infinite alternate;
+}
+
+.v23-treasure-fx__name {
+  color: #fff0bd;
+  font-family: "STKaiti", "KaiTi", serif;
+  font-size: clamp(24px, 2.25vw, 38px);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-shadow: 0 3px 16px rgba(0,0,0,.86), 0 0 18px rgba(212,161,58,.26);
+}
+
+.v23-treasure-fx__owner {
+  color: rgba(239,222,178,.82);
+  font-size: clamp(11px, .9vw, 14px);
+  letter-spacing: .10em;
+}
+
+.v23-treasure-fx__particles {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 1px;
+  height: 1px;
+  z-index: 2;
+}
+
+.v23-treasure-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f4d785;
+  box-shadow: 0 0 10px rgba(244,215,133,.9);
+  opacity: 0;
+  animation: v23TreasureParticle .9s cubic-bezier(.16,.68,.2,1) var(--v23-delay) both;
+}
+
+.v23-treasure-fly-ghost {
+  position: fixed !important;
+  z-index: 2300;
+  pointer-events: none;
+  margin: 0 !important;
+  transform-origin: center;
+}
+
+@keyframes v23TreasureContentIn {
+  0% { opacity: 0; transform: translateY(18px) scale(.88); filter: blur(4px); }
+  70% { opacity: 1; transform: translateY(-4px) scale(1.025); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes v23TreasureCardReveal {
+  0% { opacity: 0; transform: perspective(900px) rotateY(72deg) scale(.72); }
+  58% { opacity: 1; transform: perspective(900px) rotateY(-5deg) scale(1.045); }
+  100% { opacity: 1; transform: perspective(900px) rotateY(0) scale(1); }
+}
+
+@keyframes v23TreasureBurst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.26) rotate(-10deg); }
+  38% { opacity: 1; }
+  100% { opacity: .62; transform: translate(-50%, -50%) scale(1.06) rotate(12deg); }
+}
+
+@keyframes v23TreasureHalo {
+  from { opacity: .38; transform: translate(-50%, -50%) scale(.88); }
+  to { opacity: .90; transform: translate(-50%, -50%) scale(1.07); }
+}
+
+@keyframes v23TreasureParticle {
+  0% { opacity: 0; transform: rotate(var(--v23-angle)) translateX(28px) scale(.4); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--v23-angle)) translateX(var(--v23-distance)) scale(1.25); }
+}
+
+@media (max-width: 620px) {
+  .v23-treasure-fx__content { gap: 7px; }
+  .v23-treasure-fx__card { width: min(42vw, 180px); }
+  .v23-treasure-fx__burst { width: 92vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v23-treasure-fx__burst,
+  .v23-treasure-fx__content,
+  .v23-treasure-fx__card,
+  .v23-treasure-fx__halo,
+  .v23-treasure-particle {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
