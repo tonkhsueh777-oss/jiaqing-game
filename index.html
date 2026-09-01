@@ -23,8 +23,15 @@
   <link rel="stylesheet" href="v25-mobile-responsive.css?v=29">
   <link rel="stylesheet" href="v28-mobile-cross-board.css?v=29">
   <link rel="stylesheet" href="v30-beginner-assist.css?v=30">
+  <link rel="stylesheet" href="desktop-2_5d.css?v=31">
 </head>
 <body>
+  <div id="desktop-scene-layer" class="desktop-scene-layer" aria-hidden="true">
+    <div class="desktop-bg-depth desktop-bg-depth--far"></div>
+    <div class="desktop-bg-depth desktop-bg-depth--mid"></div>
+    <canvas id="desktop-fx-canvas" class="desktop-fx-canvas"></canvas>
+  </div>
+
   <div id="app" class="game-shell">
     <aside class="left-dashboard" aria-label="牌局信息">
       <div class="brand-block">
@@ -118,6 +125,8 @@
   <script>
     window.JQGame?.DesktopRuntime?.applyDesktopMode(document, window);
   </script>
+  <script src="src/desktop-scene.js?v=31"></script>
+  <script src="src/desktop-card-motion.js?v=31"></script>
   <script src="src/namespace.js?v=13"></script>
   <script src="src/v30-beginner-assist-logic.js?v=30"></script>
   <script src="src/v25-mobile-layout.js?v=29"></script>
@@ -136,6 +145,13 @@
   <script src="src/v23-visual-effects.js?v=23"></script>
   <script src="src/v25-mobile-ui.js?v=29"></script>
   <script src="src/v30-beginner-assist-ui.js?v=30"></script>
+  <script>
+    if (document.body.classList.contains('desktop-mode')) {
+      const reducedMotion = document.body.classList.contains('reduced-motion');
+      window.JQGame?.DesktopScene?.init({ root: document.documentElement, document, window, reducedMotion });
+      window.JQGame?.DesktopCardMotion?.bind(document.getElementById('app'), { reducedMotion });
+    }
+  </script>
   <script src="src/main.js?v=22"></script>
 </body>
 </html>
