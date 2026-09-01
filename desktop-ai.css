@@ -1,0 +1,51 @@
+body.desktop-mode [data-player-id] {
+  transform-style: preserve-3d;
+  transition: transform 220ms ease, filter 220ms ease, box-shadow 220ms ease;
+}
+
+body.desktop-mode [data-player-id].desktop-ai-active {
+  transform: translateZ(10px);
+  filter: brightness(1.04);
+  box-shadow:
+    0 0 0 1px rgba(226, 188, 104, .25),
+    0 0 28px rgba(218, 174, 76, .13),
+    inset 0 0 18px rgba(232, 198, 119, .04);
+  animation: desktopAiBreath 1.55s ease-in-out infinite alternate;
+}
+
+body.desktop-mode [data-player-id].desktop-ai-event--move,
+body.desktop-mode [data-player-id].desktop-ai-event--location {
+  animation: desktopAiActionFlash .48s cubic-bezier(.2,.8,.2,1) both;
+}
+
+body.desktop-mode [data-player-id].desktop-ai-event--command {
+  animation: desktopAiCommandFlash .52s cubic-bezier(.16,.78,.2,1) both;
+}
+
+body.desktop-mode [data-player-id].desktop-ai-event--discard,
+body.desktop-mode [data-player-id].desktop-ai-event--end {
+  filter: brightness(.93) saturate(.84);
+}
+
+@keyframes desktopAiBreath {
+  from { box-shadow: 0 0 0 1px rgba(226,188,104,.16), 0 0 14px rgba(218,174,76,.08); }
+  to { box-shadow: 0 0 0 1px rgba(239,205,128,.32), 0 0 34px rgba(218,174,76,.18); }
+}
+
+@keyframes desktopAiActionFlash {
+  0% { transform: translateZ(10px) scale(1); filter: brightness(1); }
+  46% { transform: translateZ(18px) scale(1.018); filter: brightness(1.13); }
+  100% { transform: translateZ(10px) scale(1); filter: brightness(1.04); }
+}
+
+@keyframes desktopAiCommandFlash {
+  0% { transform: translateZ(10px) scale(1); filter: brightness(1); }
+  35% { transform: translateZ(22px) scale(1.02); filter: brightness(1.12) sepia(.12); }
+  100% { transform: translateZ(10px) scale(1); filter: brightness(1.04); }
+}
+
+body.desktop-mode.reduced-motion [data-player-id].desktop-ai-active,
+body.desktop-mode.reduced-motion [data-player-id][class*="desktop-ai-event--"] {
+  animation: none !important;
+  transform: none;
+}
