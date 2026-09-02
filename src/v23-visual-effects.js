@@ -115,6 +115,15 @@
       [392, 523.25, 659.25, 783.99].forEach((frequency, index) => {
         oscillator({ frequency, duration: .52, volume: .025, type: 'triangle', delay: index * .09 });
       });
+      oscillator({ frequency: 1046.5, duration: .62, volume: .018, type: 'sine', delay: .34 });
+      return;
+    }
+    if (kind === 'defeat') {
+      oscillator({ frequency: 330, endFrequency: 247, duration: .42, volume: .024, type: 'triangle' });
+      oscillator({ frequency: 220, endFrequency: 147, duration: .68, volume: .027, type: 'sine', delay: .16 });
+      oscillator({ frequency: 147, endFrequency: 110, duration: .74, volume: .018, type: 'triangle', delay: .48 });
+      noise({ duration: .32, volume: .006, delay: .22, highpass: 180 });
+      return;
     }
   }
 
@@ -213,7 +222,7 @@
       effectQueue = effectQueue.then(() => showTreasureGain(gain, state));
     });
 
-    if (!previous.winnerId && snapshot.winnerId) {
+    if (!previous.winnerId && snapshot.winnerId && !game.EndgamePresentation) {
       effectQueue = effectQueue.then(async () => {
         playSound('victory');
         await sleep(120);
@@ -228,5 +237,5 @@
     previous = snapshot;
   };
 
-  game.UI.V23VisualEffects = { playSound };
+  game.UI.V23VisualEffects = { playSound, whenIdle: () => effectQueue };
 })(globalThis);
