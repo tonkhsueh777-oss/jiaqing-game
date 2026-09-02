@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="v38-overlay-priority.css?v=38">
   <link rel="stylesheet" href="v39-discard-pile.css?v=39">
   <link rel="stylesheet" href="v40-endgame.css?v=40">
+  <link rel="stylesheet" href="v41-new-game-placement.css?v=41">
 </head>
 <body>
   <div id="app" class="game-shell">
@@ -68,7 +69,6 @@
 
       <div class="left-actions">
         <button id="btn-rules" class="ghost-button" type="button">规则说明</button>
-        <button id="btn-new-game" class="ghost-button" type="button">新游戏</button>
       </div>
     </aside>
 
@@ -116,6 +116,11 @@
         <div class="panel-heading">可执行动作</div>
         <div id="action-controls" class="action-controls"></div>
       </section>
+
+      <div class="right-new-game">
+        <button id="btn-new-game" class="action-button right-new-game__button" type="button">重新开始新游戏</button>
+        <div class="right-new-game__hint">重新洗牌并开始一局新游戏</div>
+      </div>
     </aside>
   </div>
 
