@@ -1,0 +1,8 @@
+/* V38 layering fix: treasure reveal must always sit above turn handoff indicators. */
+#v23-treasure-fx-root {
+  z-index: 12000;
+}
+
+.v23-treasure-fly-ghost {
+  z-index: 12100;
+}
