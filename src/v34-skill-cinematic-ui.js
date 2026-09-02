@@ -52,13 +52,13 @@
 
   async function loadBundleBytes() {
     if (!bundlePromise) {
-      bundlePromise = fetch(`${logic.BUNDLE_SRC}?v=34`, { cache: 'force-cache' })
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          return response.text();
-        })
-        .then(text => {
-          const encoded = text.trim();
+      bundlePromise = Promise.all(logic.BUNDLE_PARTS.map(async path => {
+        const response = await fetch(`${path}?v=34`, { cache: 'force-cache' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return (await response.text()).trim();
+      }))
+        .then(parts => {
+          const encoded = parts.join('');
           if (!encoded) throw new Error('empty cinematic bundle');
           const binary = atob(encoded);
           const bytes = new Uint8Array(binary.length);
