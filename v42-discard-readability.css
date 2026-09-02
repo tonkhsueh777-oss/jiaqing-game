@@ -1,0 +1,81 @@
+/* V42: prioritize text readability while keeping only a simple stacked-card silhouette. */
+@media (min-width: 1181px) {
+  .hand-side-note.v39-discard-pile {
+    background: linear-gradient(180deg, #0a292d 0%, #071d20 100%) !important;
+    border-color: rgba(238, 204, 116, .88) !important;
+    box-shadow: 0 15px 34px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,255,255,.035) !important;
+  }
+
+  .hand-side-note.v39-discard-pile::before,
+  .hand-side-note.v39-discard-pile::after {
+    background: linear-gradient(180deg, #12373b 0%, #0a2529 100%) !important;
+    border-color: rgba(168, 205, 211, .62) !important;
+    box-shadow: 0 7px 18px rgba(0,0,0,.22) !important;
+  }
+
+  .hand-side-note.v39-discard-pile::before {
+    opacity: .92 !important;
+  }
+
+  .hand-side-note.v39-discard-pile::after {
+    opacity: .72 !important;
+  }
+
+  .v39-discard-title,
+  .v39-discard-kicker,
+  .v39-discard-flow,
+  .hand-side-note.v39-discard-pile .hand-side-note__tip {
+    position: relative;
+    z-index: 2;
+    border-radius: 7px;
+    background: rgba(3, 19, 21, .88);
+    box-shadow: inset 0 0 0 1px rgba(244, 216, 147, .08);
+    text-shadow: 0 1px 2px rgba(0,0,0,.65);
+  }
+
+  .v39-discard-title {
+    padding: 7px 8px;
+    color: #ffe7a8 !important;
+  }
+
+  .v39-discard-title small {
+    color: #f1ddb0 !important;
+  }
+
+  .v39-discard-kicker {
+    padding: 6px 8px;
+    color: #f7e8bd !important;
+    font-size: 10px !important;
+  }
+
+  .hand-side-note.v39-discard-pile .hand-side-swap.v39-discard-action {
+    position: relative;
+    z-index: 3;
+    border-color: #ffe198 !important;
+    background: linear-gradient(180deg, #b9842c 0%, #7b4e14 100%) !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  }
+
+  .v39-discard-action strong {
+    color: #fff8e8;
+    text-shadow: 0 2px 3px rgba(0,0,0,.58);
+  }
+
+  .v39-discard-action small {
+    color: #fff0c5 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,.62);
+  }
+
+  .v39-discard-flow {
+    padding: 5px 6px;
+    color: #f7dc91 !important;
+  }
+
+  .hand-side-note.v39-discard-pile .hand-side-note__tip {
+    margin: 0;
+    padding: 7px 8px;
+    color: #f2e7ca !important;
+    font-size: 9px !important;
+    line-height: 1.45 !important;
+  }
+}
