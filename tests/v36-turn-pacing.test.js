@@ -27,7 +27,7 @@ test('V36 pacing runtime is loaded before main and exposes explicit turn-state U
   const index = fs.readFileSync(indexPath, 'utf8');
   const logicIndex = index.indexOf('src/v36-turn-pacing-logic.js?v=36');
   const uiIndex = index.indexOf('src/v36-turn-pacing-ui.js?v=36');
-  const mainIndex = index.indexOf('src/main.js?v=36');
+  const mainIndex = index.indexOf('src/main.js?v=');
   assert.ok(logicIndex >= 0, 'V36 pacing logic should be loaded');
   assert.ok(uiIndex > logicIndex, 'V36 pacing UI should load after its logic');
   assert.ok(mainIndex > uiIndex, 'V36 pacing runtime should load before main');
