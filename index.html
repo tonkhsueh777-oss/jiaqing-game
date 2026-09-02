@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="v36-turn-pacing.css?v=36">
   <link rel="stylesheet" href="v37-turn-indicator.css?v=37">
   <link rel="stylesheet" href="v38-overlay-priority.css?v=38">
+  <link rel="stylesheet" href="v39-discard-pile.css?v=39">
 </head>
 <body>
   <div id="app" class="game-shell">
@@ -91,7 +92,7 @@
       <section class="hand-dashboard dashboard-panel" aria-label="玩家手牌区">
         <div id="hand-title" class="panel-heading hand-heading">玩家（你）手牌</div>
         <section id="human-panel" class="human-panel" aria-label="玩家操作区"></section>
-        <div class="hand-side-note" aria-label="换牌快捷操作">
+        <div class="hand-side-note" aria-label="弃牌堆快捷操作">
           <span class="hand-side-note__mark">御</span>
           <p>手牌上限：3 张<br>出牌后自动补至 3 张</p>
         </div>
@@ -151,6 +152,7 @@
   <script src="src/v34-main-hooks.js?v=35"></script>
   <script src="src/v36-turn-pacing-ui.js?v=36"></script>
   <script src="src/v37-turn-indicator-ui.js?v=37"></script>
+  <script src="src/v39-discard-pile-ui.js?v=39"></script>
   <script src="src/main.js?v=37"></script>
 </body>
 </html>
