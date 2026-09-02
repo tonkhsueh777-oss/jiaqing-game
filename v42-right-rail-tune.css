@@ -1,0 +1,49 @@
+/* V42 right-rail-only tune: move the unused Controls space into Action Guide. */
+@media (min-width: 1181px) {
+  .right-dashboard {
+    grid-template-rows: minmax(290px, auto) minmax(210px, auto) auto auto auto !important;
+  }
+
+  .right-dashboard .guide-panel {
+    min-height: 210px;
+  }
+
+  .right-dashboard .controls-panel {
+    min-height: 0 !important;
+  }
+
+  .right-dashboard .action-controls {
+    height: auto !important;
+    grid-template-rows: repeat(3, minmax(46px, auto)) !important;
+    align-content: start;
+  }
+
+  .right-dashboard .action-controls .action-button {
+    min-height: 46px !important;
+    height: auto !important;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 820px) {
+  .right-dashboard {
+    grid-template-rows: minmax(250px, auto) minmax(190px, auto) auto auto auto !important;
+  }
+
+  .right-dashboard .guide-panel {
+    min-height: 190px;
+  }
+}
+
+/* Rules uses a cool blue-gray treatment so it cannot be mistaken for the red New Game action. */
+.action-controls .action-button--rules {
+  background: linear-gradient(180deg, #52627c, #344158) !important;
+  border-color: rgba(157, 179, 211, .72) !important;
+  color: #f2f5fb !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 5px 14px rgba(0,0,0,.22);
+}
+
+.action-controls .action-button--rules:hover,
+.action-controls .action-button--rules:focus-visible {
+  background: linear-gradient(180deg, #617391, #3d4d68) !important;
+  border-color: rgba(188, 205, 230, .90) !important;
+}
