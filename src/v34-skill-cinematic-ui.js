@@ -8,6 +8,7 @@
   let title = null;
   let active = false;
   let activeObjectUrl = null;
+  let bundlePromise = null;
 
   function ensureOverlay() {
     if (overlay) return overlay;
@@ -49,7 +50,40 @@
     active = false;
   }
 
+  async function loadBundleBytes() {
+    if (!bundlePromise) {
+      bundlePromise = fetch(`${logic.BUNDLE_SRC}?v=34`, { cache: 'force-cache' })
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.text();
+        })
+        .then(text => {
+          const encoded = text.trim();
+          if (!encoded) throw new Error('empty cinematic bundle');
+          const binary = atob(encoded);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+          return bytes;
+        })
+        .catch(error => {
+          bundlePromise = null;
+          throw error;
+        });
+    }
+    return bundlePromise;
+  }
+
   async function resolveVideoSource(definition) {
+    try {
+      if (Array.isArray(definition.range)) {
+        const [offset, length] = definition.range;
+        const bundle = await loadBundleBytes();
+        const bytes = bundle.slice(offset, offset + length);
+        activeObjectUrl = URL.createObjectURL(new Blob([bytes], { type: 'video/mp4' }));
+        return activeObjectUrl;
+      }
+    } catch (_) {}
+
     const encodedPath = logic.encodedAssetPath(definition.src);
     try {
       const response = await fetch(`${encodedPath}?v=34`, { cache: 'force-cache' });
