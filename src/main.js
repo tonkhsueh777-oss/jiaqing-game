@@ -76,6 +76,12 @@
     return human()?.hand.find(card => card.runtimeId === runtimeId) || null;
   }
 
+  async function playSkillCinematic(card) {
+    if (!card || typeof game.SkillCinematic?.playCard !== 'function') return false;
+    if (!game.SkillCinematicLogic?.hasCinematic?.(card)) return false;
+    return game.SkillCinematic.playCard(card);
+  }
+
   function legalActionForCard(runtimeId) {
     return game.getLegalActions(state, 'human').find(action => action.runtimeId === runtimeId) || null;
   }
@@ -183,9 +189,11 @@
         label: `${t.shortName} ×${target.treasures[t.id]}`,
         image: t.asset,
         detail: `从${target.name}处换走`,
-        onSelect: () => {
+        onSelect: async () => {
+          const card = cardById(pending.runtimeId);
           const result = game.playTrumpCard(state, 'human', pending.runtimeId, pending.targetPlayerId, ownTreasureId, t.id);
-          afterHumanAction(result);
+          if (result?.ok) await playSkillCinematic(card);
+          await afterHumanAction(result);
         }
       }));
     game.UI.showChoiceDialog({
@@ -198,7 +206,10 @@
 
   async function handlePlayerTarget(playerId) {
     if (pending.kind === 'tactic') {
-      await afterHumanAction(game.playTacticCard(state, 'human', pending.runtimeId, playerId));
+      const card = cardById(pending.runtimeId);
+      const result = game.playTacticCard(state, 'human', pending.runtimeId, playerId);
+      if (result?.ok) await playSkillCinematic(card);
+      await afterHumanAction(result);
       return;
     }
     if (pending.kind === 'trump') {
@@ -224,7 +235,7 @@
   }
 
   function actionDelay(decision) {
-    if (decision.type === 'trump' || decision.type === 'tactic') return 820;
+    if (decision.type === 'trump' || decision.type === 'tactic') return 180;
     if (decision.type === 'inspect') return 720;
     return 600;
   }
@@ -232,6 +243,10 @@
   async function runAiCurrentTurn(playerId) {
     await game.runAiTurn(state, playerId, {
       afterAction: async (decision, liveState, result) => {
+        if (result?.ok && (decision.type === 'trump' || decision.type === 'tactic')) {
+          const card = liveState.discardPile.find(item => item.runtimeId === decision.runtimeId) || null;
+          await playSkillCinematic(card);
+        }
         saveAndRender();
         game.UI.showToast(result.message);
         await delay(actionDelay(decision));
