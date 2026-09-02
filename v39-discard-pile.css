@@ -1,0 +1,125 @@
+/* V39: make the fallback action look and read like a real discard pile. */
+@media (min-width: 1181px) {
+  .hand-dashboard { padding-right: 178px; }
+
+  .hand-side-note.v39-discard-pile {
+    width: 154px;
+    min-height: 202px;
+    right: 10px;
+    overflow: visible;
+    isolation: isolate;
+    align-content: center;
+    gap: 7px;
+    padding: 16px 10px 12px;
+    border: 1px solid rgba(240,203,107,.82);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgba(7,31,35,.78), rgba(5,24,27,.94)),
+      url('assets/card-back.jpg') center / cover no-repeat;
+    box-shadow: 0 15px 34px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  .hand-side-note.v39-discard-pile::before,
+  .hand-side-note.v39-discard-pile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(199,222,226,.72);
+    border-radius: 14px;
+    background: url('assets/card-back.jpg') center / cover no-repeat;
+    pointer-events: none;
+    z-index: -1;
+    box-shadow: 0 8px 20px rgba(0,0,0,.24);
+  }
+
+  .hand-side-note.v39-discard-pile::before {
+    transform: translate(-9px,-9px) rotate(-1.4deg);
+    opacity: .58;
+  }
+
+  .hand-side-note.v39-discard-pile::after {
+    transform: translate(-17px,-17px) rotate(-2.6deg);
+    opacity: .34;
+  }
+
+  .v39-discard-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+    color: #ffe19a;
+    font-family: "STKaiti", "KaiTi", serif;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 900;
+    text-shadow: 0 2px 8px rgba(0,0,0,.72);
+  }
+
+  .v39-discard-title small {
+    color: rgba(238,221,176,.78);
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .v39-discard-kicker {
+    color: #f1ddaa;
+    font-size: 10px;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  .hand-side-note.v39-discard-pile .hand-side-swap.v39-discard-action {
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 10px 7px;
+    border-radius: 11px;
+    border: 1px solid #ffd878;
+    background: linear-gradient(180deg,#c58b25,#855412);
+  }
+
+  .v39-discard-action strong {
+    display: block;
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: 950;
+  }
+
+  .v39-discard-action small {
+    display: block;
+    color: #fff0c5;
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  .v39-discard-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #f5d684;
+    font-size: 9px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .v39-discard-flow b { color: #fff2c6; font-size: 10px; }
+
+  .hand-side-note.v39-discard-pile .hand-side-note__tip {
+    color: rgba(240,226,188,.88);
+    font-size: 9px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 1180px) {
+  .action-controls [data-v13-action="end"] {
+    white-space: normal;
+    line-height: 1.25;
+  }
+}
