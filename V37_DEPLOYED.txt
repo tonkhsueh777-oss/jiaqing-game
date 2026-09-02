@@ -1,0 +1,2 @@
+V37 strong turn indicator release
+Central handoff prompt + active player highlight + token pulse
