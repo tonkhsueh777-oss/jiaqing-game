@@ -1,0 +1,34 @@
+/* V40 final result presentation: human victory vs AI defeat. */
+.modal-root.v40-endgame-root{z-index:13000!important;overflow:hidden;background:rgba(1,8,12,.88)!important;backdrop-filter:blur(5px)}
+.modal-root.v40-endgame-root--victory{background:radial-gradient(circle at 50% 38%,rgba(160,90,15,.32),rgba(5,8,10,.92) 58%,#020506 100%)!important}
+.modal-root.v40-endgame-root--defeat{background:radial-gradient(circle at 50% 35%,rgba(35,54,66,.20),rgba(2,8,13,.95) 62%,#010407 100%)!important}
+.v40-endgame{position:relative;width:min(880px,94vw)!important;max-height:90vh!important;overflow:auto!important;padding:34px 36px 30px!important;border-radius:24px!important;isolation:isolate;animation:v40ResultIn .52s cubic-bezier(.16,.8,.2,1) both}
+.v40-endgame--victory{border:2px solid rgba(249,212,114,.85)!important;background:linear-gradient(180deg,rgba(61,34,8,.96),rgba(16,20,17,.97))!important;box-shadow:0 30px 110px rgba(0,0,0,.72),0 0 70px rgba(235,171,48,.28)!important}
+.v40-endgame--defeat{border:1px solid rgba(122,151,167,.48)!important;background:linear-gradient(180deg,rgba(20,33,42,.97),rgba(7,14,21,.98))!important;box-shadow:0 30px 110px rgba(0,0,0,.76),0 0 50px rgba(64,94,113,.18)!important;filter:saturate(.78)}
+.v40-endgame__atmosphere{position:absolute;inset:0;z-index:-1;overflow:hidden;border-radius:inherit;pointer-events:none}
+.v40-endgame__rays{position:absolute;inset:-40%;background:repeating-conic-gradient(from -8deg,rgba(255,216,111,.13) 0 4deg,transparent 4deg 13deg);animation:v40Spin 18s linear infinite}
+.v40-endgame__particles i{position:absolute;left:var(--x);top:-12%;width:8px;height:16px;border-radius:2px;background:linear-gradient(180deg,#fff0a9,#d78d24);opacity:.9;animation:v40Confetti 2.8s cubic-bezier(.2,.7,.2,1) var(--d) infinite}
+.v40-endgame__rain{position:absolute;inset:-20% 0 0;background:repeating-linear-gradient(112deg,transparent 0 24px,rgba(133,163,181,.10) 25px 27px,transparent 28px 51px);animation:v40Rain 1.3s linear infinite}
+.v40-endgame__seal{width:86px;height:86px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;font-family:STKaiti,KaiTi,serif;font-size:48px;font-weight:900;border:2px solid currentColor;box-shadow:0 0 0 8px rgba(255,255,255,.035)}
+.v40-endgame--victory .v40-endgame__seal{color:#ffe39a;background:rgba(149,83,15,.48);box-shadow:0 0 0 8px rgba(255,225,141,.06),0 0 44px rgba(255,192,60,.38);animation:v40SealPulse 1s ease-in-out infinite alternate}
+.v40-endgame--defeat .v40-endgame__seal{color:#aebfca;background:rgba(44,61,72,.52);box-shadow:0 0 0 8px rgba(174,191,202,.04),0 0 34px rgba(83,112,130,.16)}
+.v40-endgame__kicker{margin-bottom:8px;font-size:12px;font-weight:900;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;opacity:.78}
+.v40-endgame--victory .v40-endgame__kicker{color:#f5cc6c}.v40-endgame--defeat .v40-endgame__kicker{color:#91a8b7}
+.v40-endgame h2{font-size:clamp(32px,5vw,58px)!important;line-height:1.05;margin:0 0 12px!important;text-shadow:0 3px 18px rgba(0,0,0,.72)}
+.v40-endgame--victory h2{color:#fff0b7!important}.v40-endgame--defeat h2{color:#d7e0e6!important}
+.v40-endgame>p{font-size:clamp(15px,1.7vw,20px);margin:0 auto 20px;max-width:660px}
+.v40-endgame--victory>p{color:#f1d8a2!important}.v40-endgame--defeat>p{color:#aebbc3!important}
+.v40-endgame .winner-four{position:relative;z-index:2;gap:12px!important;margin:18px auto 0!important;max-width:720px}
+.v40-endgame .winner-four>div{padding:8px;border-radius:12px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.08)}
+.v40-endgame--victory .winner-four>div{border-color:rgba(244,203,101,.28);box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.v40-endgame--defeat .winner-four>div{opacity:.72;filter:grayscale(.22)}
+.v40-endgame .winner-four img{aspect-ratio:2154/3326;object-fit:cover}.v40-endgame .winner-four strong{display:block;margin-top:6px;font-size:12px}
+.v40-endgame .modal-actions{justify-content:center!important;margin-top:22px!important}
+.v40-endgame .modal-actions button{min-width:150px}
+@keyframes v40ResultIn{0%{opacity:0;transform:translateY(22px) scale(.94);filter:blur(6px)}100%{opacity:1;transform:none;filter:none}}
+@keyframes v40Spin{to{transform:rotate(360deg)}}
+@keyframes v40Confetti{0%{transform:translate3d(0,-20px,0) rotate(0);opacity:0}12%{opacity:1}100%{transform:translate3d(calc((var(--i) % 5 - 2)*22px),115vh,0) rotate(760deg);opacity:.08}}
+@keyframes v40Rain{to{transform:translate3d(-28px,58px,0)}}
+@keyframes v40SealPulse{from{transform:scale(.96)}to{transform:scale(1.05)}}
+@media(max-width:640px){.v40-endgame{padding:24px 14px 20px!important}.v40-endgame__seal{width:68px;height:68px;font-size:38px}.v40-endgame .winner-four{grid-template-columns:repeat(2,1fr)!important}.v40-endgame .modal-actions button{min-width:0;flex:1 1 140px}}
+@media(prefers-reduced-motion:reduce){.v40-endgame,.v40-endgame__rays,.v40-endgame__particles i,.v40-endgame__rain,.v40-endgame__seal{animation:none!important}}
