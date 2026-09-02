@@ -1,0 +1,110 @@
+/* V42-only enhancement: V43B-style guidance, scoped strictly to the right Action Guide. */
+#action-guide .v42-right-guide {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 9px;
+  padding: 10px 11px;
+  border: 1px solid rgba(241,205,111,.48);
+  border-radius: 9px;
+  background: linear-gradient(180deg,rgba(22,52,51,.92),rgba(10,32,33,.94));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+
+#action-guide .v42-right-guide__title {
+  color: #fff0b6;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 900;
+}
+
+#action-guide .v42-right-guide__detail {
+  color: #f0e3bd;
+  font-size: 10px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+#action-guide .v42-right-guide__next {
+  margin-top: 1px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: #d8cdb0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+#action-guide .v42-right-guide--discard {
+  border-color: rgba(245,184,72,.82);
+  background: linear-gradient(180deg,rgba(62,47,18,.80),rgba(24,32,27,.94));
+}
+
+#action-guide .v42-right-guide--choice {
+  border-color: rgba(104,191,213,.72);
+  background: linear-gradient(180deg,rgba(16,53,61,.92),rgba(7,30,35,.95));
+}
+
+@media (max-width: 760px) {
+  #action-guide .v42-right-guide { padding: 8px 9px; margin-bottom: 7px; }
+  #action-guide .v42-right-guide__title { font-size: 11px; }
+  #action-guide .v42-right-guide__detail,
+  #action-guide .v42-right-guide__next { font-size: 9px; }
+}
+
+/* V42 localized tweak: make the gold beginner hint easier to notice with a breathing glow. */
+#action-guide .v42-right-guide--discard {
+  position: relative;
+  isolation: isolate;
+  border-color: rgba(255, 210, 106, .92);
+  box-shadow:
+    0 0 0 1px rgba(255, 223, 142, .10) inset,
+    0 0 0 rgba(255, 202, 84, 0),
+    0 0 0 rgba(255, 202, 84, 0);
+  animation: v42GuideBreath 1.85s ease-in-out infinite;
+}
+
+#action-guide .v42-right-guide--discard .v42-right-guide__title {
+  color: #fff5c8;
+  text-shadow: 0 0 10px rgba(255, 221, 124, .22);
+}
+
+#action-guide .v42-right-guide--discard::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(255, 220, 132, .42);
+  opacity: .72;
+  animation: v42GuideHalo 1.85s ease-in-out infinite;
+}
+
+@keyframes v42GuideBreath {
+  0%, 100% {
+    border-color: rgba(248, 193, 78, .78);
+    box-shadow:
+      0 0 0 1px rgba(255, 223, 142, .08) inset,
+      0 0 0 0 rgba(255, 194, 61, .00),
+      0 0 14px rgba(255, 189, 52, .10);
+    transform: translateY(0);
+  }
+  50% {
+    border-color: rgba(255, 227, 142, 1);
+    box-shadow:
+      0 0 0 1px rgba(255, 238, 174, .16) inset,
+      0 0 0 2px rgba(255, 207, 92, .18),
+      0 0 24px rgba(255, 192, 61, .30);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes v42GuideHalo {
+  0%, 100% { opacity: .34; }
+  50% { opacity: .88; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #action-guide .v42-right-guide--discard,
+  #action-guide .v42-right-guide--discard::after {
+    animation: none;
+  }
+}
