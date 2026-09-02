@@ -17,7 +17,8 @@ test('cinematic definitions point to six-second MP4 assets and correct activatio
     key: 'jiaqingOrder',
     src: 'assets/video/jiaqing-order.mp4',
     title: '嘉庆令发动',
-    durationMs: 6000
+    durationMs: 6000,
+    range: [0, 113874]
   });
   assert.equal(logic.getCinematic('wangOrder').title, '王德禄令发动');
   assert.equal(logic.getCinematic('bully').title, '恶霸王豹发动');
@@ -28,4 +29,10 @@ test('cinematic definitions point to six-second MP4 assets and correct activatio
 
 test('base64 transport path keeps the MP4 identity while using a text asset', () => {
   assert.equal(logic.encodedAssetPath('assets/video/jiaqing-order.mp4'), 'assets/video/jiaqing-order.mp4.b64');
+});
+
+test('cinematic bundle ranges identify each embedded MP4', () => {
+  assert.equal(logic.BUNDLE_SRC, 'assets/video/v34-cinematics.bundle.b64');
+  assert.deepEqual(logic.getCinematic('jiaqingOrder').range, [0, 113874]);
+  assert.deepEqual(logic.getCinematic('flower').range, [468352, 126792]);
 });
