@@ -87,7 +87,7 @@ async function showDraw(root, overlay, effect) {
       <small>${owner}</small>
       <div class="v2-draw-card-wrap">
         ${hidden
-          ? `<div class="v2-draw-card-back"><span>御</span></div>`
+          ? '<div class="v2-draw-card-back"><span>御</span></div>'
           : `<img class="v2-draw-card" src="${src}" alt="${effect.cardName}">`}
       </div>
       <strong>${hidden ? `补牌 ×${effect.count || 1}` : effect.cardName}</strong>
@@ -95,6 +95,21 @@ async function showDraw(root, overlay, effect) {
   await sleep(qualityDuration(root, 520, 250));
   overlay.classList.add('is-leaving');
   await sleep(qualityDuration(root, 130, 60));
+  clearOverlay(overlay);
+}
+
+async function showDiscard(root, overlay, effect) {
+  if (!overlay) return;
+  const src = resolveCardAsset(cardLike(effect));
+  overlay.className = 'v2-presentation-overlay is-active is-discard-flight';
+  overlay.innerHTML = `
+    <div class="v2-discard-label"><small>弃牌</small><strong>${effect.cardName}</strong></div>
+    ${src
+      ? `<img class="v2-discard-flying-card" src="${src}" alt="${effect.cardName}">`
+      : `<div class="v2-discard-flying-card v2-discard-flying-card--empty">${effect.cardName}</div>`}`;
+  await sleep(qualityDuration(root, 600, 280));
+  overlay.classList.add('is-leaving');
+  await sleep(qualityDuration(root, 100, 50));
   clearOverlay(overlay);
 }
 
@@ -177,6 +192,10 @@ export function createPresentationDirector({ root, stage, audio = null }) {
       }
       if (effect.kind === 'draw-card' || effect.kind === 'draw-hidden') {
         await showDraw(root, overlay, effect);
+        continue;
+      }
+      if (effect.kind === 'discard') {
+        await showDiscard(root, overlay, effect);
         continue;
       }
       if (effect.kind === 'victory' || effect.kind === 'defeat') {
