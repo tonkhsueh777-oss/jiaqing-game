@@ -1,6 +1,7 @@
 import { defineConfig, searchForWorkspaceRoot } from 'vite';
 
 export default defineConfig({
+  base: './',
   clearScreen: false,
   server: {
     port: 1420,
