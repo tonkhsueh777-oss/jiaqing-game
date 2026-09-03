@@ -34,7 +34,10 @@ export function shellMarkup() {
         <section class="v2-section v2-preview"><span>牌面预览</span><div id="v2-card-preview">请选择一张手牌</div></section>
         <section class="v2-section v2-guide"><span>行动说明</span><div id="v2-action-guide">读取牌局后显示可执行动作。</div></section>
         <section class="v2-section"><span>可执行动作</span><div id="v2-actions" class="v2-actions"></div></section>
-        <button class="v2-button" type="button" data-action="toggle-fullscreen">切换全屏</button>
+        <div class="v2-utility-actions">
+          <button class="v2-button" type="button" data-action="toggle-sound">音效：开</button>
+          <button class="v2-button" type="button" data-action="toggle-fullscreen">切换全屏</button>
+        </div>
       </aside>
     </main>`;
 }
