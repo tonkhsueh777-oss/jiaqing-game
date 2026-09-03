@@ -12,13 +12,17 @@
 .v2-deck-grid span { display:block; color:#93aaa5; font-size:9px; }
 .v2-deck-grid strong { display:block; margin-top:3px; color:#f6d57e; font-size:18px; }
 #v2-action-log { display:grid; gap:4px; color:#9eb4ae; font-size:9px; line-height:1.4; }
-.v2-hand__cards { perspective:1000px; }
-.v2-hand-card { position:relative; width:min(112px,10vw); aspect-ratio:.68; margin:0 -4px; padding:0; border:0; border-radius:10px; background:#07181b; transform:rotate(var(--fan)) translateY(3px); transform-origin:50% 120%; cursor:pointer; transition:transform .16s ease, filter .16s ease, opacity .16s ease; box-shadow:0 12px 24px rgba(0,0,0,.32); overflow:hidden; }
+.v2-hand__cards { perspective:1000px; perspective-origin:50% 80%; transform-style:preserve-3d; }
+.v2-hand-card { position:relative; width:min(112px,10vw); aspect-ratio:.68; margin:0 -4px; padding:0; border:0; border-radius:10px; background:#07181b; transform:rotate(var(--fan)) rotateX(7deg) translateY(5px) translateZ(0); transform-origin:50% 120%; transform-style:preserve-3d; cursor:pointer; transition:transform .18s cubic-bezier(.2,.8,.2,1), filter .16s ease, opacity .16s ease, box-shadow .18s ease; box-shadow:0 9px 0 rgba(2,10,11,.62),0 18px 30px rgba(0,0,0,.38); overflow:hidden; will-change:transform; }
+.v2-hand-card::before { content:""; position:absolute; z-index:2; inset:0; pointer-events:none; border-radius:inherit; background:linear-gradient(118deg,rgba(255,255,255,.10),transparent 24%,transparent 68%,rgba(232,191,92,.07)); opacity:.72; }
+.v2-hand-card.is-legal::after { content:""; position:absolute; z-index:3; inset:2px; pointer-events:none; border:1px solid rgba(237,194,83,.58); border-radius:8px; box-shadow:inset 0 0 10px rgba(224,170,48,.08),0 0 14px rgba(224,170,48,.12); animation:v2LegalCardBreath 1.8s ease-in-out infinite; }
 .v2-hand-card img { width:100%; height:100%; display:block; object-fit:cover; }
-.v2-hand-card > span { position:absolute; left:7px; right:7px; bottom:6px; padding:4px 5px; border-radius:6px; color:#fff4d5; background:rgba(5,18,19,.82); font-size:9px; font-weight:800; text-align:center; backdrop-filter:blur(3px); }
-.v2-hand-card:hover { transform:rotate(var(--fan)) translateY(-12px) scale(1.035); filter:brightness(1.08); z-index:3; }
-.v2-hand-card.is-selected { transform:rotate(var(--fan)) translateY(-18px) scale(1.055); outline:2px solid rgba(246,196,74,.95); box-shadow:0 0 0 4px rgba(221,159,40,.13),0 18px 30px rgba(0,0,0,.38),0 0 28px rgba(230,167,46,.22); z-index:4; }
-.v2-hand-card.is-disabled:not(.is-selected) { opacity:.55; filter:saturate(.65) brightness(.74); }
+.v2-hand-card > span { position:absolute; z-index:4; left:7px; right:7px; bottom:6px; padding:4px 5px; border-radius:6px; color:#fff4d5; background:rgba(5,18,19,.82); font-size:9px; font-weight:800; text-align:center; backdrop-filter:blur(3px); }
+.v2-hand-card:hover { transform:rotate(var(--fan)) rotateX(2deg) translateY(-16px) translateZ(18px) scale(1.035); filter:brightness(1.08); box-shadow:0 10px 0 rgba(2,10,11,.52),0 24px 40px rgba(0,0,0,.45),0 0 24px rgba(220,169,55,.10); z-index:3; }
+.v2-hand-card.is-selected { transform:rotate(calc(var(--fan) * .45)) rotateX(-2deg) translateY(-24px) translateZ(28px) scale(1.06); outline:2px solid rgba(246,196,74,.95); box-shadow:0 10px 0 rgba(89,61,17,.72),0 0 0 4px rgba(221,159,40,.13),0 24px 42px rgba(0,0,0,.46),0 0 34px rgba(230,167,46,.25); z-index:4; }
+.v2-hand-card.is-selected::before { opacity:.95; background:linear-gradient(118deg,rgba(255,244,197,.18),transparent 28%,transparent 62%,rgba(244,197,85,.12)); }
+.v2-hand-card.is-disabled:not(.is-selected) { opacity:.55; filter:saturate(.65) brightness(.74); transform:rotate(var(--fan)) rotateX(8deg) translateY(8px); }
+.v2-hand-card.is-disabled::after { display:none; }
 .v2-preview-empty { height:170px; display:grid; place-items:center; color:#7f9792; border:1px dashed rgba(210,174,92,.18); border-radius:10px; font-size:11px; }
 .v2-preview-card { text-align:center; }
 .v2-preview-card img { width:min(128px,72%); max-height:185px; object-fit:cover; border-radius:9px; border:1px solid rgba(230,192,99,.45); box-shadow:0 10px 24px rgba(0,0,0,.3); }
@@ -37,5 +41,10 @@
 #app[data-activity="ai-finished"] .v2-hand { opacity:.58; filter:saturate(.72); }
 #app[data-activity="ai-thinking"] .v2-turn-banner,
 #app[data-activity="ai-action"] .v2-turn-banner { box-shadow:0 0 28px rgba(205,143,43,.18); }
+@keyframes v2LegalCardBreath {
+  0%,100% { opacity:.48; box-shadow:inset 0 0 8px rgba(224,170,48,.06),0 0 10px rgba(224,170,48,.08); }
+  50% { opacity:1; box-shadow:inset 0 0 14px rgba(224,170,48,.13),0 0 22px rgba(224,170,48,.19); }
+}
 @media (max-width:1280px) { .v2-hand-card { width:min(98px,9.5vw); } .v2-player-row { padding:6px; } }
 @media (max-height:800px) { .v2-hand-card { width:min(92px,9vw); } .v2-preview-card img { max-height:135px; } }
+@media (prefers-reduced-motion: reduce) { .v2-hand-card, .v2-hand-card.is-legal::after { transition-duration:.001ms !important; animation:none !important; } }
