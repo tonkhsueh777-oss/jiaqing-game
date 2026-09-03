@@ -7,6 +7,7 @@
   const baseSetInteractionMode = game.UI.setInteractionMode.bind(game.UI);
   let lastState = null;
   let lastMode = 'idle';
+  let lastPayload = {};
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>'\"]/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -45,6 +46,20 @@
     target?.querySelector('.v42-right-guide')?.remove();
   }
 
+  function selectedSpecial(state) {
+    const runtimeId = lastPayload?.selectedRuntimeId;
+    if (!runtimeId) return null;
+    const card = state?.players?.find?.(player => player.id === 'human')?.hand?.find?.(item => item.runtimeId === runtimeId);
+    if (!card || (card.type !== 'tactic' && card.type !== 'trump')) return null;
+    const guide = game.SpecialCardGuideLogic;
+    return {
+      name: card.name,
+      typeLabel: guide?.typeLabelFor?.(card) || (card.type === 'trump' ? '王牌' : '计策牌'),
+      detail: guide?.detailFor?.(card) || '',
+      targetPrompt: guide?.targetPromptFor?.(card) || ''
+    };
+  }
+
   function renderGuide(state) {
     const target = document.getElementById('action-guide');
     if (!target) return;
@@ -52,13 +67,14 @@
 
     if (!beginnerEnabled() || !isHumanTurn(state)) return;
 
-    // Replace the older generic helper only inside the right-side Action Guide.
     target.querySelector('.beginner-extra-help')?.remove();
 
     const guide = logic.guideFor({
       humanTurn: true,
       mode: lastMode,
-      playableNames: playableNames(state)
+      playableNames: playableNames(state),
+      special: selectedSpecial(state),
+      hint: lastPayload?.hint || ''
     });
     if (!guide) return;
 
@@ -80,6 +96,7 @@
 
   game.UI.setInteractionMode = function setInteractionModeV42RightGuide(mode, payload) {
     lastMode = mode || 'idle';
+    lastPayload = payload || {};
     const result = baseSetInteractionMode(mode, payload);
     renderGuide(lastState);
     return result;
