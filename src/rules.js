@@ -154,7 +154,8 @@
       const message = `发动【${removed.name}】，随机烧掉${target.name}的1张手牌【${burnedCard.name}】。`;
       state.log.push(`${player.name}：${message}`);
       player.lastAction = message;
-      target.lastAction = `被${player.name}发动【${removed.name}】，失去1张手牌；下回合再正常补牌。`;
+      target.firePenaltyPending = true;
+      target.lastAction = `被${player.name}发动【${removed.name}】，失去1张手牌；下个自己的回合将以现有手牌开始。`;
       return { ok: true, message, targetPlayerId, effect: 'burnHand', burnedCard };
     }
 
@@ -229,10 +230,16 @@
     }
 
     state.phase = 'action';
-    const { cards } = game.refillHandToLimit(state, player.id, 3, rng);
-    const message = cards.length > 0
-      ? `${player.name}补牌${cards.length}张，手牌恢复至${player.hand.length}张，进入行动阶段。`
-      : `${player.name}进入行动阶段。`;
+    const firePenaltyActive = Boolean(player.firePenaltyPending);
+    if (firePenaltyActive) player.firePenaltyPending = false;
+    const { cards } = firePenaltyActive
+      ? { cards: [] }
+      : game.refillHandToLimit(state, player.id, 3, rng);
+    const message = firePenaltyActive
+      ? `${player.name}受【火烧百顺楼】影响，本回合以${player.hand.length}张手牌开始，不在回合开始时补牌。`
+      : cards.length > 0
+        ? `${player.name}补牌${cards.length}张，手牌恢复至${player.hand.length}张，进入行动阶段。`
+        : `${player.name}进入行动阶段。`;
     state.log.push(message);
     player.lastAction = message;
     return { ok: true, skipped: false, cards, message };
@@ -252,6 +259,7 @@
     game.advancePlayer(state);
     return { ok: true, cards, message };
   };
+
 
   game.passTurnBySwappingCard = function passTurnBySwappingCard(state, playerId, runtimeId, rng = Math.random) {
     if (!canAct(state, playerId)) return { ok: false, message: '当前不是你的行动阶段。' };
