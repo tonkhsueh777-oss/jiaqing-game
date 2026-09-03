@@ -1,9 +1,12 @@
 import './ui/app-shell.css';
 import './ui/hud.css';
+import './presentation/presentation.css';
 import { loadV43Core } from './core/v43-bootstrap.js';
 import { createGameAdapter } from './core/game-adapter.js';
 import { createTurnController } from './gameplay/turn-controller.js';
 import { createPlatformApi } from './platform/platform-api.js';
+import { createPresentationDirector } from './presentation/presentation-director.js';
+import { buildPresentationSequence } from './presentation/presentation-events.js';
 import { createDesktopSession } from './state/desktop-session.js';
 import { renderAppShell } from './ui/app-shell.js';
 import { renderHud } from './ui/hud-view.js';
@@ -31,6 +34,7 @@ async function boot() {
 
   const stageHost = root.querySelector('#v2-stage-canvas-host');
   const stage = await mountStage(stageHost, session, { quality: qualityFromRoot(root) });
+  const director = createPresentationDirector({ root, stage });
 
   function refresh() {
     hud = renderHud(root, game, session, selectedRuntimeId, interaction);
@@ -41,8 +45,10 @@ async function boot() {
     adapter,
     session,
     aiDelayMs: qualityFromRoot(root) === 'low' ? 360 : 520,
-    onChange(event) {
+    async onChange(event) {
       root.dataset.activity = event.type;
+      const sequence = buildPresentationSequence(event);
+      if (sequence.length) await director.play(sequence, event);
       refresh();
     }
   });
