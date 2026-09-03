@@ -134,7 +134,7 @@
     return { ok: true, message, treasureId, gained: true };
   };
 
-  game.playTacticCard = function playTacticCard(state, playerId, runtimeId, targetPlayerId) {
+  game.playTacticCard = function playTacticCard(state, playerId, runtimeId, targetPlayerId, rng = Math.random) {
     if (!canAct(state, playerId)) return { ok: false, message: '当前不是你的行动阶段。' };
     if (playerId === targetPlayerId) return { ok: false, message: '计策牌不能指定自己。' };
     const player = findPlayer(state, playerId);
@@ -142,15 +142,40 @@
     const card = findCard(player, runtimeId);
     if (!target) return { ok: false, message: '找不到目标玩家。' };
     if (!card || card.type !== 'tactic') return { ok: false, message: '这不是计策牌。' };
+    if (card.key === 'fire' && target.hand.length <= 0) return { ok: false, message: '目标玩家目前没有手牌可以烧掉。' };
 
     const removed = takeCard(player, runtimeId);
     state.discardPile.push(removed);
-    target.skipTurns += 1;
+
+    if (removed.key === 'fire') {
+      const index = Math.min(target.hand.length - 1, Math.max(0, Math.floor(rng() * target.hand.length)));
+      const burnedCard = target.hand.splice(index, 1)[0];
+      state.discardPile.push(burnedCard);
+      const message = `发动【${removed.name}】，随机烧掉${target.name}的1张手牌【${burnedCard.name}】。`;
+      state.log.push(`${player.name}：${message}`);
+      player.lastAction = message;
+      target.lastAction = `被${player.name}发动【${removed.name}】，失去1张手牌；下回合再正常补牌。`;
+      return { ok: true, message, targetPlayerId, effect: 'burnHand', burnedCard };
+    }
+
+    if (removed.key === 'flower') {
+      const playerPosition = player.position;
+      player.position = target.position;
+      target.position = playerPosition;
+      const message = `发动【${removed.name}】，与${target.name}交换当前位置。`;
+      state.log.push(`${player.name}：${message}`);
+      player.lastAction = message;
+      target.lastAction = `被${player.name}发动【${removed.name}】，双方位置已交换。`;
+      return { ok: true, message, targetPlayerId, effect: 'swapPosition', playerPosition: player.position, targetPosition: target.position };
+    }
+
+    target.skipTurns = (target.skipTurns || 0) + 1;
+    target.skipSource = removed.name;
     const message = `发动【${removed.name}】，${target.name}下一个完整回合将被跳过。`;
     state.log.push(`${player.name}：${message}`);
     player.lastAction = message;
-    target.lastAction = `被${player.name}施加计策，待跳过${target.skipTurns}回合。`;
-    return { ok: true, message, targetPlayerId };
+    target.lastAction = `被${player.name}发动【${removed.name}】，待跳过${target.skipTurns}回合。`;
+    return { ok: true, message, targetPlayerId, effect: 'skipTurn' };
   };
 
   game.playTrumpCard = function playTrumpCard(state, playerId, runtimeId, targetPlayerId, ownTreasureId, targetTreasureId) {
@@ -194,7 +219,9 @@
 
     if (player.skipTurns > 0) {
       player.skipTurns -= 1;
-      const message = `${player.name}受计策影响，本回合完全跳过。`;
+      const source = player.skipSource ? `【${player.skipSource}】` : '计策';
+      const message = `${player.name}受${source}影响，本回合无法行动。`;
+      if (player.skipTurns <= 0) player.skipSource = '';
       state.log.push(message);
       player.lastAction = message;
       game.advancePlayer(state);
@@ -225,7 +252,6 @@
     game.advancePlayer(state);
     return { ok: true, cards, message };
   };
-
 
   game.passTurnBySwappingCard = function passTurnBySwappingCard(state, playerId, runtimeId, rng = Math.random) {
     if (!canAct(state, playerId)) return { ok: false, message: '当前不是你的行动阶段。' };
@@ -267,6 +293,22 @@
     return { ok: true, message };
   };
 
+  game.getCardUnavailableReason = function getCardUnavailableReason(state, playerId, card) {
+    const player = findPlayer(state, playerId);
+    if (!player || !card) return '找不到这张牌。';
+    if (!canAct(state, playerId)) return '当前还不是你的行动阶段。';
+    if (card.type === 'trump') {
+      if (!Object.values(player.treasures).some(v => v > 0)) return `${card.name}现在不能发动：你目前没有可以拿来交换的宝物。`;
+      const targetHasTreasure = state.players.some(p => p.id !== playerId && Object.values(p.treasures).some(v => v > 0));
+      if (!targetHasTreasure) return `${card.name}现在不能发动：其他玩家目前都没有可以交换的宝物。`;
+    }
+    if (card.type === 'tactic' && card.key === 'fire') {
+      const hasTargetHand = state.players.some(p => p.id !== playerId && p.hand.length > 0);
+      if (!hasTargetHand) return `${card.name}现在不能发动：其他玩家目前都没有手牌可以烧掉。`;
+    }
+    return '这张牌目前没有可执行的目标或条件。';
+  };
+
   game.getLegalActions = function getLegalActions(state, playerId) {
     const player = findPlayer(state, playerId);
     if (!player || state.winnerId) return [];
@@ -288,8 +330,10 @@
           actions.push({ type: 'inspect', runtimeId: card.runtimeId, locationId: player.position });
         }
       } else if (card.type === 'tactic') {
-        const targets = state.players.filter(p => p.id !== playerId).map(p => p.id);
-        if (targets.length) actions.push({ type: 'tactic', runtimeId: card.runtimeId, targets });
+        const targets = state.players
+          .filter(p => p.id !== playerId && (card.key !== 'fire' || p.hand.length > 0))
+          .map(p => p.id);
+        if (targets.length) actions.push({ type: 'tactic', runtimeId: card.runtimeId, targets, tacticKey: card.key });
       } else if (card.type === 'trump') {
         const targets = state.players.filter(p => p.id !== playerId && Object.values(p.treasures).some(v => v > 0)).map(p => p.id);
         if (Object.values(player.treasures).some(v => v > 0) && targets.length) {
