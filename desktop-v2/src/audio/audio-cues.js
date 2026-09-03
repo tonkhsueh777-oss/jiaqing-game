@@ -1,6 +1,8 @@
 export function cueForPresentation(effect) {
   switch (effect?.kind) {
     case 'card-reveal': return 'reveal';
+    case 'draw-card':
+    case 'draw-hidden': return 'draw';
     case 'move': return 'move';
     case 'swap': return 'swap';
     case 'burn': return 'fire';
