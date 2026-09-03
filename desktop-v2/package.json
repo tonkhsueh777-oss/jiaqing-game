@@ -1,0 +1,25 @@
+{
+  "name": "jiaqing-game-desktop-v2",
+  "private": true,
+  "version": "2.0.0-alpha.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "node --test tests/*.test.js",
+    "test:vitest": "vitest run",
+    "tauri": "tauri",
+    "desktop:dev": "tauri dev",
+    "desktop:build:mac": "tauri build --target universal-apple-darwin --bundles app,dmg",
+    "verify:v43-boundary": "node scripts/verify-v43-boundary.mjs",
+    "verify": "npm test && npm run build && npm run verify:v43-boundary"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "vite": "^7.0.0",
+    "vitest": "^4.0.0"
+  }
+}
