@@ -91,7 +91,64 @@
 .v2-presentation-overlay.is-burn .v2-effect-banner { border-color:rgba(211,92,53,.72); box-shadow:0 18px 46px rgba(0,0,0,.48),0 0 34px rgba(201,66,36,.18); }
 .v2-presentation-overlay.is-lock .v2-effect-banner { box-shadow:0 18px 46px rgba(0,0,0,.48),0 0 34px rgba(220,177,70,.17); }
 .v2-presentation-overlay.is-swap .v2-effect-banner { box-shadow:0 18px 46px rgba(0,0,0,.48),0 0 38px rgba(163,123,214,.12); }
-[data-quality="low"] .v2-reveal-shade { backdrop-filter:none; }
+.v2-burned-card-wrap {
+  position:absolute;
+  left:50%;
+  top:38%;
+  width:112px;
+  transform:translate(-50%,-50%);
+  animation:v2BurnCard .72s ease-in both;
+  filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));
+}
+.v2-burned-card {
+  width:100%;
+  display:block;
+  border-radius:10px;
+  border:2px solid rgba(224,110,63,.82);
+}
+.v2-endgame-shade {
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 45%,rgba(220,175,70,.18),rgba(1,8,10,.9) 62%,rgba(1,7,9,.97));
+  backdrop-filter:blur(3px);
+}
+.v2-presentation-overlay.is-defeat .v2-endgame-shade {
+  background:radial-gradient(circle at 50% 45%,rgba(70,90,105,.16),rgba(1,8,10,.91) 62%,rgba(1,7,9,.98));
+}
+.v2-endgame-panel {
+  position:relative;
+  z-index:2;
+  width:min(560px,76%);
+  padding:28px 32px 26px;
+  text-align:center;
+  border:1px solid rgba(235,197,100,.62);
+  border-radius:22px;
+  background:linear-gradient(180deg,rgba(48,39,22,.96),rgba(8,25,27,.97));
+  box-shadow:0 28px 80px rgba(0,0,0,.58),0 0 52px rgba(222,169,53,.15);
+  animation:v2EndgameIn .7s cubic-bezier(.18,.78,.22,1) both;
+}
+.v2-presentation-overlay.is-defeat .v2-endgame-panel {
+  border-color:rgba(120,146,157,.48);
+  background:linear-gradient(180deg,rgba(29,39,43,.97),rgba(7,20,23,.98));
+  box-shadow:0 28px 80px rgba(0,0,0,.62),0 0 42px rgba(70,101,115,.12);
+}
+.v2-endgame-panel small { display:block; color:#c6aa63; font-size:10px; letter-spacing:.18em; }
+.v2-endgame-panel strong {
+  display:block;
+  margin-top:8px;
+  color:#ffe7a0;
+  font-family:"STKaiti","KaiTi","PingFang SC",serif;
+  font-size:34px;
+  letter-spacing:.12em;
+  text-shadow:0 3px 18px rgba(0,0,0,.72);
+}
+.v2-presentation-overlay.is-defeat .v2-endgame-panel strong { color:#ced8d8; }
+.v2-endgame-panel p { margin:8px 0 18px; color:#c5d0cb; font-size:12px; }
+.v2-endgame-treasures { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.v2-endgame-treasure { padding:8px 6px; border:1px solid rgba(218,183,93,.22); border-radius:12px; background:rgba(5,22,24,.66); }
+.v2-endgame-treasure img { width:54px; height:78px; object-fit:cover; border-radius:7px; display:block; margin:0 auto 5px; }
+.v2-endgame-treasure span { color:#d8c58c; font-size:9px; font-weight:800; }
+[data-quality="low"] .v2-reveal-shade, [data-quality="low"] .v2-endgame-shade { backdrop-filter:none; }
 [data-quality="low"] .v2-reveal-card-wrap::before { display:none; }
 [data-quality="low"] .v2-reveal-card { box-shadow:0 18px 44px rgba(0,0,0,.55); }
 @keyframes v2RevealRise {
@@ -107,6 +164,16 @@
   from { opacity:0; transform:translateY(18px) scale(.96); }
   to { opacity:1; transform:translateY(0) scale(1); }
 }
+@keyframes v2BurnCard {
+  0% { opacity:1; transform:translate(-50%,-50%) scale(.96) rotate(-2deg); filter:brightness(1); }
+  55% { opacity:1; transform:translate(-50%,-54%) scale(1.04) rotate(2deg); filter:brightness(1.35) sepia(.4); }
+  100% { opacity:0; transform:translate(-50%,-66%) scale(.82) rotate(8deg); filter:brightness(.55) sepia(1); }
+}
+@keyframes v2EndgameIn {
+  0% { opacity:0; transform:translateY(30px) scale(.9); }
+  66% { opacity:1; transform:translateY(-5px) scale(1.025); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .v2-reveal-content, .v2-effect-banner, .v2-reveal-card-wrap::before { animation:none !important; }
+  .v2-reveal-content, .v2-effect-banner, .v2-reveal-card-wrap::before, .v2-burned-card-wrap, .v2-endgame-panel { animation:none !important; }
 }
