@@ -156,6 +156,27 @@ async function boot() {
 
     const appAction = event.target.closest?.('[data-action]');
     if (!appAction) return;
+
+    if (appAction.dataset.action === 'save-game') {
+      await session.save();
+      const original = '保存牌局';
+      appAction.textContent = '已保存';
+      setTimeout(() => { appAction.textContent = original; }, 900);
+      return;
+    }
+
+    if (appAction.dataset.action === 'new-game') {
+      if (controller.busy || root.querySelector('.v2-presentation-overlay.is-active')) return;
+      const confirmed = globalThis.confirm ? globalThis.confirm('重新开始会清除当前本机牌局，确定重新开始吗？') : true;
+      if (!confirmed) return;
+      await session.newGame();
+      selectedRuntimeId = null;
+      interaction = {};
+      refresh();
+      await controller.start();
+      return;
+    }
+
     if (appAction.dataset.action === 'toggle-fullscreen') {
       platform.window.toggleFullscreen();
       return;
