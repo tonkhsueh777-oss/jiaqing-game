@@ -53,13 +53,15 @@ button { font: inherit; }
 .v2-preview { min-height: 210px; }
 .v2-guide { min-height: 160px; flex: 1; }
 .v2-actions { display:grid; gap:8px; }
-.v2-button { margin-top:12px; min-height:44px; border:1px solid rgba(222,188,105,.55); border-radius:10px; color:#fff1c2; background:linear-gradient(180deg,#6f592a,#453718); cursor:pointer; }
+.v2-utility-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.v2-button { min-height:44px; border:1px solid rgba(222,188,105,.55); border-radius:10px; color:#fff1c2; background:linear-gradient(180deg,#6f592a,#453718); cursor:pointer; }
 .v2-button:hover { filter:brightness(1.08); }
 [data-quality="low"] .v2-stage::after { background:linear-gradient(180deg,rgba(0,0,0,.12),transparent 18%,transparent 84%,rgba(0,0,0,.18)); }
 @media (max-width: 1280px) {
   .v2-shell { grid-template-columns: 210px minmax(0,1fr) 240px; gap: 8px; padding: 8px; }
   .v2-left, .v2-right { padding: 10px; }
   .v2-stage-topline { left:10px; right:10px; top:9px; }
+  .v2-utility-actions { grid-template-columns:1fr; }
 }
 @media (max-height: 800px) {
   .v2-center { grid-template-rows:minmax(0,1fr) 180px; }
