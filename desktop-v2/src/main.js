@@ -10,9 +10,10 @@ import { createPlatformApi } from './platform/platform-api.js';
 import { createPresentationDirector } from './presentation/presentation-director.js';
 import { buildPresentationSequence } from './presentation/presentation-events.js';
 import { createDesktopSession } from './state/desktop-session.js';
+import { buildStageGuidance, renderStageGuidance } from './stage/stage-guidance.js';
+import { mountStage } from './stage/stage-view.js';
 import { renderAppShell } from './ui/app-shell.js';
 import { renderHud } from './ui/hud-view.js';
-import { mountStage } from './stage/stage-view.js';
 
 function qualityFromRoot(root) {
   return root.dataset.quality || 'standard';
@@ -52,6 +53,7 @@ async function boot() {
   function refresh() {
     hud = renderHud(root, game, session, selectedRuntimeId, interaction);
     stage.render(session.state, { quality: qualityFromRoot(root) });
+    renderStageGuidance(root, buildStageGuidance(hud, interaction), session.state);
   }
 
   const controller = createTurnController({
@@ -192,7 +194,7 @@ async function boot() {
       const quality = button.dataset.quality === 'low' ? 'low' : 'standard';
       root.dataset.quality = quality;
       root.querySelectorAll('[data-quality]').forEach(item => item.classList.toggle('is-active', item === button));
-      stage.render(session.state, { quality });
+      refresh();
     });
   });
 
