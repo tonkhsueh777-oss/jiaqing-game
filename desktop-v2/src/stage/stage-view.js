@@ -4,6 +4,10 @@ import tainanUrl from '../../../assets/cards/03-tainan.jpg';
 import mengxiaUrl from '../../../assets/cards/04-mengxia.jpg';
 import zhuluoUrl from '../../../assets/cards/05-zhuluo.jpg';
 import madouUrl from '../../../assets/cards/06-madou.jpg';
+import goldSealUrl from '../../../assets/cards/07-gold-seal.jpg';
+import swordUrl from '../../../assets/cards/08-sword.jpg';
+import gunUrl from '../../../assets/cards/09-gun.jpg';
+import pomeloUrl from '../../../assets/cards/10-pomelo.jpg';
 import cardBackUrl from '../../../assets/card-back.jpg';
 
 const LOCATION_ART = Object.freeze({
@@ -11,6 +15,20 @@ const LOCATION_ART = Object.freeze({
   mengxia: mengxiaUrl,
   zhuluo: zhuluoUrl,
   madou: madouUrl
+});
+
+const TREASURE_ART = Object.freeze({
+  goldSeal: goldSealUrl,
+  sword: swordUrl,
+  gun: gunUrl,
+  pomelo: pomeloUrl
+});
+
+const TREASURE_META = Object.freeze({
+  goldSeal: { short: '印', label: '金印', color: 0xe4b94c },
+  sword: { short: '剑', label: '宝剑', color: 0xd7d2bd },
+  gun: { short: '枪', label: '火枪', color: 0xc58d58 },
+  pomelo: { short: '柚', label: '柚子', color: 0xd3bf55 }
 });
 
 const PLAYER_STYLE = Object.freeze({
@@ -215,8 +233,69 @@ function drawCenter(layer, width, height) {
   layer.addChild(title);
 }
 
-function createPlayerToken(playerId, active = false) {
-  const style = PLAYER_STYLE[playerId] || PLAYER_STYLE.ai2;
+function drawTreasureRack(holder, player, treasureTextures) {
+  const ids = Object.keys(TREASURE_META);
+  const slotSize = 19;
+  const gap = 4;
+  const totalW = ids.length * slotSize + (ids.length - 1) * gap;
+  const rack = new Container();
+  rack.x = -totalW / 2 + slotSize / 2;
+  rack.y = 37;
+
+  const plate = new Graphics();
+  plate.roundRect(-8, -7, totalW + 16, slotSize + 14, 10)
+    .fill({ color: 0x061719, alpha: 0.92 })
+    .stroke({ color: player.treasureKinds >= 3 ? 0xe7be5b : 0x8c784a, width: 1.2, alpha: 0.66 });
+  rack.addChild(plate);
+
+  ids.forEach((id, index) => {
+    const meta = TREASURE_META[id];
+    const count = player.treasures?.[id] || 0;
+    const x = index * (slotSize + gap);
+    const slot = new Graphics();
+    slot.circle(x, slotSize / 2, slotSize / 2)
+      .fill({ color: count ? 0x25352e : 0x0b2729, alpha: 0.98 })
+      .stroke({ color: count ? meta.color : 0x5f6c65, width: count ? 1.6 : 1, alpha: count ? 0.9 : 0.35 });
+    rack.addChild(slot);
+
+    if (count && treasureTextures[id]) {
+      const sprite = new Sprite(treasureTextures[id]);
+      sprite.anchor.set(0.5);
+      const target = slotSize - 4;
+      const scale = Math.max(target / sprite.texture.width, target / sprite.texture.height);
+      sprite.scale.set(scale);
+      sprite.x = x;
+      sprite.y = slotSize / 2;
+      const mask = new Graphics();
+      mask.circle(x, slotSize / 2, target / 2).fill(0xffffff);
+      rack.addChild(mask);
+      sprite.mask = mask;
+      rack.addChild(sprite);
+    } else {
+      const empty = makeText(meta.short, 8, '#71847b', '800');
+      empty.anchor.set(0.5);
+      empty.x = x;
+      empty.y = slotSize / 2;
+      rack.addChild(empty);
+    }
+
+    if (count > 1) {
+      const badge = new Graphics();
+      badge.circle(x + 7, 2, 6).fill({ color: 0x7b5226, alpha: 0.98 }).stroke({ color: 0xf0cf7a, width: 1, alpha: 0.9 });
+      rack.addChild(badge);
+      const countText = makeText(String(count), 7, '#fff3c9', '900');
+      countText.anchor.set(0.5);
+      countText.x = x + 7;
+      countText.y = 2;
+      rack.addChild(countText);
+    }
+  });
+
+  holder.addChild(rack);
+}
+
+function createPlayerToken(player, treasureTextures, active = false) {
+  const style = PLAYER_STYLE[player.id] || PLAYER_STYLE.ai2;
   const holder = new Container();
   const token = new Graphics();
   if (active) token.circle(0, 0, 27).fill({ color: style.edge, alpha: 0.18 });
@@ -227,10 +306,11 @@ function createPlayerToken(playerId, active = false) {
   label.anchor.set(0.5);
   label.y = -1;
   holder.addChild(label);
+  drawTreasureRack(holder, player, treasureTextures);
   return holder;
 }
 
-function drawPlayers(layer, width, height, players, hiddenIds = new Set()) {
+function drawPlayers(layer, width, height, players, treasureTextures, hiddenIds = new Set()) {
   const grouped = new Map();
   for (const player of players) {
     if (hiddenIds.has(player.id)) continue;
@@ -241,8 +321,8 @@ function drawPlayers(layer, width, height, players, hiddenIds = new Set()) {
 
   for (const group of grouped.values()) {
     group.forEach((player, index) => {
-      const spread = (index - (group.length - 1) / 2) * 44;
-      const holder = createPlayerToken(player.id, player.active);
+      const spread = (index - (group.length - 1) / 2) * 92;
+      const holder = createPlayerToken(player, treasureTextures, player.active);
       holder.x = width * player.x + spread;
       holder.y = height * player.y - 8;
       layer.addChild(holder);
@@ -253,6 +333,12 @@ function drawPlayers(layer, width, height, players, hiddenIds = new Set()) {
 function stagePoint(position, width, height) {
   const slot = position === 'center' ? STAGE_LAYOUT.center : (STAGE_LAYOUT.locations[position] || STAGE_LAYOUT.center);
   return { x: width * slot.x, y: height * slot.y - 8 };
+}
+
+function playerTreasurePoint(state, playerId, width, height) {
+  const player = playerById(state, playerId);
+  const base = stagePoint(player?.position || 'center', width, height);
+  return { x: base.x, y: base.y + 48 };
 }
 
 function easeOutCubic(t) {
@@ -272,8 +358,8 @@ function tween(duration, update) {
   });
 }
 
-async function animateToken(app, playerId, from, to, width, height, duration, arc = 28) {
-  const holder = createPlayerToken(playerId, true);
+async function animateToken(app, player, treasureTextures, from, to, width, height, duration, arc = 28) {
+  const holder = createPlayerToken(player, treasureTextures, true);
   const start = stagePoint(from, width, height);
   const end = stagePoint(to, width, height);
   holder.x = start.x;
@@ -283,6 +369,47 @@ async function animateToken(app, playerId, from, to, width, height, duration, ar
     holder.x = start.x + (end.x - start.x) * eased;
     holder.y = start.y + (end.y - start.y) * eased - Math.sin(Math.PI * raw) * arc;
     holder.scale.set(1 + Math.sin(Math.PI * raw) * 0.12);
+  });
+  holder.destroy({ children: true });
+}
+
+async function animateTreasure(app, texture, treasureId, start, end, duration, arc = 52) {
+  const meta = TREASURE_META[treasureId] || TREASURE_META.goldSeal;
+  const holder = new Container();
+  holder.x = start.x;
+  holder.y = start.y;
+
+  const glow = new Graphics();
+  glow.circle(0, 0, 30).fill({ color: meta.color, alpha: 0.18 });
+  glow.circle(0, 0, 23).stroke({ color: meta.color, width: 2.5, alpha: 0.8 });
+  holder.addChild(glow);
+
+  if (texture) {
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    const targetW = 36;
+    const targetH = 52;
+    const scale = Math.max(targetW / sprite.texture.width, targetH / sprite.texture.height);
+    sprite.scale.set(scale);
+    const mask = new Graphics();
+    mask.roundRect(-targetW / 2, -targetH / 2, targetW, targetH, 7).fill(0xffffff);
+    holder.addChild(mask);
+    sprite.mask = mask;
+    holder.addChild(sprite);
+  }
+
+  const tag = makeText(meta.label, 10, '#fff0bd', '900');
+  tag.anchor.set(0.5);
+  tag.y = 38;
+  holder.addChild(tag);
+  app.stage.addChild(holder);
+
+  await tween(duration, (eased, raw) => {
+    holder.x = start.x + (end.x - start.x) * eased;
+    holder.y = start.y + (end.y - start.y) * eased - Math.sin(Math.PI * raw) * arc;
+    holder.rotation = Math.sin(Math.PI * raw) * 0.12;
+    holder.scale.set(0.88 + Math.sin(Math.PI * raw) * 0.22);
+    glow.alpha = 0.72 + Math.sin(Math.PI * raw) * 0.28;
   });
   holder.destroy({ children: true });
 }
@@ -323,7 +450,10 @@ export async function mountStage(host, session, options = {}) {
 
   const textures = {};
   for (const [key, url] of Object.entries(LOCATION_ART)) textures[key] = await Assets.load(url);
+  for (const [key, url] of Object.entries(TREASURE_ART)) textures[key] = await Assets.load(url);
   textures.cardBack = await Assets.load(cardBackUrl);
+
+  const treasureTextures = Object.fromEntries(Object.keys(TREASURE_ART).map(id => [id, textures[id]]));
 
   function renderState(state, renderOptions = {}) {
     const qualityId = renderOptions.quality || options.quality || 'standard';
@@ -337,7 +467,7 @@ export async function mountStage(host, session, options = {}) {
     for (const location of model.locations) drawLocation(layer, width, height, location, textures[location.id]);
     drawDeckStacks(layer, width, height, model.deck, textures.cardBack);
     drawCenter(layer, width, height);
-    drawPlayers(layer, width, height, model.players, new Set(renderOptions.hiddenPlayerIds || []));
+    drawPlayers(layer, width, height, model.players, treasureTextures, new Set(renderOptions.hiddenPlayerIds || []));
     return { model, width, height };
   }
 
@@ -351,17 +481,20 @@ export async function mountStage(host, session, options = {}) {
     const duration = Math.round(620 * motionScale);
 
     if (effect.kind === 'move') {
+      const beforePlayer = playerById(beforeState, effect.playerId) || { id: effect.playerId, treasures: {} };
       const { width, height } = renderState(beforeState, { quality, hiddenPlayerIds: [effect.playerId] });
-      await animateToken(app, effect.playerId, effect.from, effect.to, width, height, duration, 34 * motionScale);
+      await animateToken(app, beforePlayer, treasureTextures, effect.from, effect.to, width, height, duration, 34 * motionScale);
       renderState(afterState, { quality });
       return;
     }
 
     if (effect.kind === 'swap') {
+      const beforePlayer = playerById(beforeState, effect.playerId) || { id: effect.playerId, treasures: {} };
+      const beforeTarget = playerById(beforeState, effect.targetPlayerId) || { id: effect.targetPlayerId, treasures: {} };
       const { width, height } = renderState(beforeState, { quality, hiddenPlayerIds: [effect.playerId, effect.targetPlayerId] });
       await Promise.all([
-        animateToken(app, effect.playerId, effect.from, effect.to, width, height, duration, 42 * motionScale),
-        animateToken(app, effect.targetPlayerId, effect.targetFrom, effect.targetTo, width, height, duration, -42 * motionScale)
+        animateToken(app, beforePlayer, treasureTextures, effect.from, effect.to, width, height, duration, 42 * motionScale),
+        animateToken(app, beforeTarget, treasureTextures, effect.targetFrom, effect.targetTo, width, height, duration, -42 * motionScale)
       ]);
       renderState(afterState, { quality });
       return;
@@ -375,31 +508,37 @@ export async function mountStage(host, session, options = {}) {
       return;
     }
 
-    const { width, height } = renderState(afterState, { quality });
-    if (effect.kind === 'burn' || effect.kind === 'lock') {
-      const target = playerById(afterState, effect.targetPlayerId);
-      const point = stagePoint(target?.position || 'center', width, height);
-      await pulseEffect(app, point, effect, quality);
-      renderState(afterState, { quality });
-      return;
-    }
-
     if (effect.kind === 'treasure') {
-      const point = stagePoint(effect.locationId || 'center', width, height);
-      await pulseEffect(app, point, effect, quality);
+      const { width, height } = renderState(beforeState, { quality });
+      const start = stagePoint(effect.locationId || 'center', width, height);
+      const end = playerTreasurePoint(afterState, effect.playerId, width, height);
+      await animateTreasure(app, treasureTextures[effect.treasureId], effect.treasureId, start, end, Math.round(720 * motionScale), 64 * motionScale);
+      await pulseEffect(app, end, effect, quality);
       renderState(afterState, { quality });
       return;
     }
 
     if (effect.kind === 'treasure-swap') {
-      const player = playerById(afterState, effect.playerId);
-      const target = playerById(afterState, effect.targetPlayerId);
-      const a = stagePoint(player?.position || 'center', width, height);
-      const b = stagePoint(target?.position || 'center', width, height);
+      const { width, height } = renderState(beforeState, { quality });
+      const a = playerTreasurePoint(beforeState, effect.playerId, width, height);
+      const b = playerTreasurePoint(beforeState, effect.targetPlayerId, width, height);
+      await Promise.all([
+        animateTreasure(app, treasureTextures[effect.ownTreasureId], effect.ownTreasureId, a, b, Math.round(760 * motionScale), 70 * motionScale),
+        animateTreasure(app, treasureTextures[effect.targetTreasureId], effect.targetTreasureId, b, a, Math.round(760 * motionScale), -70 * motionScale)
+      ]);
       await Promise.all([
         pulseEffect(app, a, effect, quality),
         pulseEffect(app, b, effect, quality)
       ]);
+      renderState(afterState, { quality });
+      return;
+    }
+
+    const { width, height } = renderState(afterState, { quality });
+    if (effect.kind === 'burn' || effect.kind === 'lock') {
+      const target = playerById(afterState, effect.targetPlayerId);
+      const point = stagePoint(target?.position || 'center', width, height);
+      await pulseEffect(app, point, effect, quality);
       renderState(afterState, { quality });
     }
   }
