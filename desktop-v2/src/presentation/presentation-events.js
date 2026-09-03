@@ -19,6 +19,26 @@ function revealForAi(event, action, card) {
   };
 }
 
+function drawCardEffect(playerId, card) {
+  return {
+    kind: 'draw-card',
+    playerId,
+    cardName: card?.name || '新手牌',
+    cardKey: card?.key || '',
+    cardType: card?.type || '',
+    locationId: card?.locationId || ''
+  };
+}
+
+function drawSequence(event) {
+  const cards = event?.result?.cards || [];
+  if (!cards.length) return [];
+  if (event.playerId !== 'human') {
+    return [{ kind: 'draw-hidden', playerId: event.playerId, count: cards.length }];
+  }
+  return cards.map(card => drawCardEffect(event.playerId, card));
+}
+
 export function buildPresentationSequence(event) {
   if (!event) return [];
 
@@ -31,6 +51,10 @@ export function buildPresentationSequence(event) {
       winnerId,
       winnerName: winner?.name || (winnerId === 'human' ? '玩家（你）' : 'AI玩家')
     }];
+  }
+
+  if (event.type === 'turn-start' || event.type === 'human-refill' || event.type === 'ai-refill') {
+    return drawSequence(event);
   }
 
   if (!event.result?.ok) return [];
@@ -132,6 +156,9 @@ export function buildPresentationSequence(event) {
 
   if (action.type === 'discard' || action.type === 'pass' || action.type === 'swapPass') {
     sequence.push({ kind: 'discard', playerId: event.playerId, cardName });
+    if (event.playerId === 'human' && event.result?.cards?.length) {
+      sequence.push(...event.result.cards.map(card => drawCardEffect('human', card)));
+    }
   }
 
   return sequence;
