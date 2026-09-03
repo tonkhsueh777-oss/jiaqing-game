@@ -1,5 +1,6 @@
 (function (root) {
   const game = root.JQGame;
+  const specialGuide = game.SpecialCardGuideLogic;
   let state = null;
   let runningLoop = false;
   let pending = { kind: null, runtimeId: null, targetPlayerId: null };
@@ -46,9 +47,36 @@
 
   async function showHumanDraw(cards, interactive = false) {
     const drawn = Array.isArray(cards) ? cards.filter(Boolean) : [];
-    if (!drawn.length || typeof game.UI.showDrawRitual !== 'function') return;
-    game.saveGame(state);
-    await game.UI.showDrawRitual(drawn, { interactive });
+    if (!drawn.length) return;
+    if (typeof game.UI.showDrawRitual === 'function') {
+      game.saveGame(state);
+      await game.UI.showDrawRitual(drawn, { interactive });
+    }
+  }
+
+  function storageGet(key) {
+    try { return root.localStorage?.getItem?.(key); } catch (_) { return null; }
+  }
+
+  function storageSet(key, value) {
+    try { root.localStorage?.setItem?.(key, value); } catch (_) {}
+  }
+
+  function maybeShowSpecialCardTutorial(cards) {
+    const specials = (Array.isArray(cards) ? cards : []).filter(card => card?.type === 'tactic' || card?.type === 'trump');
+    if (!specials.length || !specialGuide) return false;
+    const type = specials.find(card => !storageGet(`jq-v43-special-tutorial-${card.type}`))?.type;
+    if (!type) return false;
+    const tutorial = specialGuide.tutorialFor(type);
+    if (!tutorial) return false;
+    storageSet(`jq-v43-special-tutorial-${type}`, '1');
+    game.UI.showChoiceDialog({
+      title: tutorial.title,
+      message: tutorial.message,
+      choices: [],
+      cancelText: '知道了'
+    });
+    return true;
   }
 
   async function afterHumanAction(result) {
@@ -100,7 +128,13 @@
     }
     const legal = legalActionForCard(runtimeId);
     if (!legal) {
-      game.UI.showToast('这张牌目前没有合法用法。');
+      const reason = typeof game.getCardUnavailableReason === 'function'
+        ? game.getCardUnavailableReason(state, 'human', card)
+        : '这张牌目前没有合法用法。';
+      if (card.type === 'tactic' || card.type === 'trump') {
+        game.UI.setInteractionMode('specialUnavailable', { selectedRuntimeId: runtimeId, specialCardKey: card.key, hint: reason });
+      }
+      game.UI.showToast(reason);
       return;
     }
 
@@ -136,8 +170,9 @@
       pending = { kind: 'tactic', runtimeId, targetPlayerId: null };
       game.UI.setInteractionMode('chooseTacticTarget', {
         selectedRuntimeId: runtimeId,
+        specialCardKey: card.key,
         legalPlayerTargets: legal.targets || [],
-        hint: '请选择一名AI玩家。计策结算后会自动补牌并结束你的回合。'
+        hint: specialGuide?.targetPromptFor?.(card) || '下一步：请选择一名对手。'
       });
       return;
     }
@@ -146,8 +181,9 @@
       pending = { kind: 'trump', runtimeId, targetPlayerId: null };
       game.UI.setInteractionMode('chooseTrumpOpponent', {
         selectedRuntimeId: runtimeId,
+        specialCardKey: card.key,
         legalPlayerTargets: legal.targets || [],
-        hint: '先选择要强制交换圣物的AI玩家。'
+        hint: specialGuide?.targetPromptFor?.(card) || '下一步：先选择一名对手。'
       });
     }
   }
@@ -157,8 +193,32 @@
     await afterHumanAction(game.playTravelCard(state, 'human', pending.runtimeId, destination));
   }
 
+  function locationName(position) {
+    return position === 'center' ? '中央起点' : (game.LOCATIONS[position]?.name || position);
+  }
+
+  function confirmTacticUse(targetPlayerId) {
+    const card = cardById(pending.runtimeId);
+    const target = state.players.find(p => p.id === targetPlayerId);
+    if (!card || !target) return resetPending();
+    let effect = specialGuide?.summaryFor?.(card) || '发动计策';
+    if (card.key === 'flower') effect = `你：${locationName(human().position)} → ${locationName(target.position)}；${target.name}：${locationName(target.position)} → ${locationName(human().position)}`;
+    game.UI.showChoiceDialog({
+      title: `确认发动【${card.name}】？`,
+      message: `目标：${target.name}。效果：${effect}。`,
+      choices: [{
+        label: '发动计策',
+        detail: specialGuide?.detailFor?.(card) || effect,
+        onSelect: () => afterHumanAction(game.playTacticCard(state, 'human', pending.runtimeId, targetPlayerId))
+      }],
+      cancelText: '取消',
+      onCancel: resetPending
+    });
+  }
+
   function chooseTrumpOwnTreasure() {
     const actor = human();
+    const card = cardById(pending.runtimeId);
     const choices = Object.values(game.TREASURES)
       .filter(t => actor.treasures[t.id] > 0)
       .map(t => ({
@@ -167,9 +227,14 @@
         detail: '作为交换筹码',
         onSelect: () => chooseTrumpTargetTreasure(t.id)
       }));
+    game.UI.setInteractionMode('chooseTrumpOwnTreasure', {
+      selectedRuntimeId: pending.runtimeId,
+      specialCardKey: card?.key,
+      hint: '下一步：选择1件你拥有的宝物，作为交换筹码。'
+    });
     game.UI.showChoiceDialog({
-      title: '选择你的交换圣物',
-      message: '选择1件你拥有的圣物，作为王牌交换筹码。',
+      title: '选择你的交换宝物',
+      message: '选择1件你拥有的宝物，作为王牌交换筹码。',
       choices,
       onCancel: resetPending
     });
@@ -177,36 +242,54 @@
 
   function chooseTrumpTargetTreasure(ownTreasureId) {
     const target = state.players.find(p => p.id === pending.targetPlayerId);
+    const card = cardById(pending.runtimeId);
     const choices = Object.values(game.TREASURES)
       .filter(t => target && target.treasures[t.id] > 0)
       .map(t => ({
         label: `${t.shortName} ×${target.treasures[t.id]}`,
         image: t.asset,
         detail: `从${target.name}处换走`,
-        onSelect: () => {
-          const result = game.playTrumpCard(state, 'human', pending.runtimeId, pending.targetPlayerId, ownTreasureId, t.id);
-          afterHumanAction(result);
-        }
+        onSelect: () => confirmTrumpExchange(ownTreasureId, t.id)
       }));
+    game.UI.setInteractionMode('chooseTrumpTargetTreasure', {
+      selectedRuntimeId: pending.runtimeId,
+      specialCardKey: card?.key,
+      hint: `下一步：选择要从${target?.name || '对手'}处换走的1件宝物。`
+    });
     game.UI.showChoiceDialog({
-      title: '选择对手圣物',
-      message: '选择要从对手处强制换走的1件圣物。',
+      title: '选择对手宝物',
+      message: '选择要从对手处强制换走的1件宝物。',
       choices,
       onCancel: resetPending
     });
   }
 
+  function confirmTrumpExchange(ownTreasureId, targetTreasureId) {
+    const card = cardById(pending.runtimeId);
+    const target = state.players.find(p => p.id === pending.targetPlayerId);
+    const ownTreasure = game.TREASURES[ownTreasureId];
+    const targetTreasure = game.TREASURES[targetTreasureId];
+    if (!card || !target || !ownTreasure || !targetTreasure) return resetPending();
+    game.UI.showChoiceDialog({
+      title: `确认发动【${card.name}】？`,
+      message: `目标：${target.name}。你交出【${ownTreasure.name}】，换取【${targetTreasure.name}】。此操作确认后无法撤销。`,
+      choices: [{
+        label: `确认发动${card.name}`,
+        detail: `交出${ownTreasure.shortName} → 获得${targetTreasure.shortName}`,
+        onSelect: () => afterHumanAction(game.playTrumpCard(state, 'human', pending.runtimeId, pending.targetPlayerId, ownTreasureId, targetTreasureId))
+      }],
+      cancelText: '重新选择',
+      onCancel: chooseTrumpOwnTreasure
+    });
+  }
+
   async function handlePlayerTarget(playerId) {
     if (pending.kind === 'tactic') {
-      await afterHumanAction(game.playTacticCard(state, 'human', pending.runtimeId, playerId));
+      confirmTacticUse(playerId);
       return;
     }
     if (pending.kind === 'trump') {
       pending.targetPlayerId = playerId;
-      game.UI.setInteractionMode('chooseTrumpOwnTreasure', {
-        selectedRuntimeId: pending.runtimeId,
-        hint: '已选择对手。接下来选择你要拿来交换的圣物。'
-      });
       chooseTrumpOwnTreasure();
     }
   }
@@ -269,6 +352,7 @@
         const active = currentPlayer();
         if (active.id === 'human') {
           game.UI.setInteractionMode('idle');
+          maybeShowSpecialCardTutorial(human()?.hand || []);
           break;
         }
 
