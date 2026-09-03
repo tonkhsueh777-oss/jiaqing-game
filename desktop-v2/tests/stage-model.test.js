@@ -39,6 +39,22 @@ test('stage model exposes unopened locations until their V43地牌 is played', (
   assert.equal(model.locations.find(item => item.id === 'zhuluo').opened, false);
 });
 
+test('stage model exposes physical draw and discard stacks with current counts', () => {
+  const state = {
+    currentPlayerIndex: 0,
+    openedLocations: {},
+    players: [],
+    drawPile: [{ runtimeId: 'd1' }, { runtimeId: 'd2' }, { runtimeId: 'd3' }],
+    discardPile: [{ runtimeId: 'x1', name: '巡游', type: 'travel', key: 'xunyou' }]
+  };
+  const model = buildStageModel(state);
+  assert.equal(model.deck.drawCount, 3);
+  assert.equal(model.deck.discardCount, 1);
+  assert.equal(model.deck.topDiscard.name, '巡游');
+  assert.equal(model.deck.draw.x < 0.2, true);
+  assert.equal(model.deck.discard.x > 0.8, true);
+});
+
 test('stage model exposes standard and low performance profiles', () => {
   const state = { currentPlayerIndex: 0, openedLocations: {}, players: [] };
   assert.equal(buildStageModel(state, { quality: 'standard' }).quality.particles, true);
