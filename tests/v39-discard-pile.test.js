@@ -29,7 +29,7 @@ test('V39 assets load after prior UI layers and before main', () => {
   const v39Css = index.indexOf('v39-discard-pile.css?v=39');
   const v37Ui = index.indexOf('src/v37-turn-indicator-ui.js?v=37');
   const v39Ui = index.indexOf('src/v39-discard-pile-ui.js?v=39');
-  const main = index.indexOf('src/main.js?v=37');
+  const main = index.search(/src\/main\.js\?v=[^"']+/);
   assert.ok(v39Css > v38Css);
   assert.ok(v39Ui > v37Ui);
   assert.ok(main > v39Ui);
