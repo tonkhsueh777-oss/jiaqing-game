@@ -1,16 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { shellMarkup } from '../src/ui/app-shell.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, '..');
-
-test('desktop-v2 has an isolated desktop entry and does not reuse root index', () => {
-  const htmlPath = path.join(root, 'index.html');
-  assert.equal(fs.existsSync(htmlPath), true, 'desktop-v2/index.html should exist');
-  const html = fs.readFileSync(htmlPath, 'utf8');
-  assert.match(html, /id=["']app["']/);
-  assert.match(html, /\/src\/main\.js/);
+test('V2 desktop shell exposes stage, hand, action guide and fullscreen control', () => {
+  const html = shellMarkup();
+  assert.match(html, /id="v2-stage"/);
+  assert.match(html, /id="v2-stage-canvas-host"/);
+  assert.match(html, /id="v2-hand"/);
+  assert.match(html, /id="v2-action-guide"/);
+  assert.match(html, /data-action="toggle-fullscreen"/);
+  assert.match(html, /data-quality="standard"/);
+  assert.match(html, /data-quality="low"/);
 });

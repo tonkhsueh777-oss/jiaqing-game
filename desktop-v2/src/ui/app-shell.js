@@ -3,22 +3,26 @@ export function shellMarkup() {
     <main class="v2-shell">
       <aside id="v2-left-panel" class="v2-panel v2-left" aria-label="牌局信息">
         <div class="v2-brand">
-          <span class="v2-brand__eyebrow">MAC DESKTOP · V2</span>
           <h1>嘉庆君游台湾：御前争霸</h1>
-          <p>御前圣物争夺 · 2.5D 演出版</p>
+          <p>V2 本机端 · 御案 2.5D 演出版</p>
         </div>
         <section class="v2-section"><span>回合状态</span><strong id="v2-turn-status">准备开局</strong></section>
         <section class="v2-section"><span>玩家一览</span><div id="v2-player-list"></div></section>
         <section class="v2-section"><span>宝物总览</span><div id="v2-treasure-list"></div></section>
+        <section class="v2-section"><span>牌堆信息</span><div id="v2-deck-status"></div></section>
+        <section class="v2-section v2-log"><span>行动记录</span><div id="v2-action-log"></div></section>
       </aside>
 
       <section class="v2-center">
         <div id="v2-stage" class="v2-stage" aria-label="2.5D 主舞台">
-          <div class="v2-stage-placeholder">
-            <span>御前战局</span>
-            <strong>2.5D STAGE</strong>
-            <small>下一阶段接入 PixiJS 场景</small>
+          <div class="v2-stage-topline">
+            <div class="v2-turn-banner"><small>御前战局</small><strong id="v2-stage-turn">你的回合</strong></div>
+            <div class="v2-quality" aria-label="画质模式">
+              <button type="button" data-quality="standard" class="is-active">标准</button>
+              <button type="button" data-quality="low">旧 Mac</button>
+            </div>
           </div>
+          <div id="v2-stage-canvas-host" class="v2-stage-canvas-host"></div>
         </div>
         <div id="v2-hand" class="v2-hand" aria-label="玩家手牌">
           <div class="v2-hand__label">玩家手牌</div>

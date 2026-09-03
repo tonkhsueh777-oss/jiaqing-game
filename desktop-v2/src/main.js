@@ -4,6 +4,11 @@ import { createGameAdapter } from './core/game-adapter.js';
 import { createPlatformApi } from './platform/platform-api.js';
 import { createDesktopSession } from './state/desktop-session.js';
 import { renderAppShell } from './ui/app-shell.js';
+import { mountStage } from './stage/stage-view.js';
+
+function qualityFromRoot(root) {
+  return root.dataset.quality || 'standard';
+}
 
 async function boot() {
   const game = await loadV43Core();
@@ -13,10 +18,26 @@ async function boot() {
   const root = document.querySelector('#app');
   if (!root) throw new Error('V2 app root not found');
 
+  root.dataset.quality = 'standard';
   renderAppShell(root, session);
+
+  const stageHost = root.querySelector('#v2-stage-canvas-host');
+  const stage = await mountStage(stageHost, session, { quality: qualityFromRoot(root) });
+
   root.querySelector('[data-action="toggle-fullscreen"]')?.addEventListener('click', () => {
     platform.window.toggleFullscreen();
   });
+
+  root.querySelectorAll('[data-quality]').forEach(button => {
+    button.addEventListener('click', () => {
+      const quality = button.dataset.quality === 'low' ? 'low' : 'standard';
+      root.dataset.quality = quality;
+      root.querySelectorAll('[data-quality]').forEach(item => item.classList.toggle('is-active', item === button));
+      stage.render(session.state, { quality });
+    });
+  });
+
+  window.addEventListener('resize', () => stage.render(session.state, { quality: qualityFromRoot(root) }));
 }
 
 boot().catch(error => {
