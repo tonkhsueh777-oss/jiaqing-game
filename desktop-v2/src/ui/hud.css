@@ -27,7 +27,15 @@
 .v2-preview-card p { margin:7px 0 0; color:#a9bbb5; font-size:9px; line-height:1.45; text-align:left; }
 #v2-action-guide { color:#c2cdc8; font-size:11px; line-height:1.6; }
 .v2-action-button { min-height:39px; border:1px solid rgba(226,188,96,.36); border-radius:9px; color:#ffe9ad; background:linear-gradient(180deg,#234f53,#15373a); cursor:pointer; font-size:11px; font-weight:800; }
+.v2-action-button--gold { border-color:rgba(246,205,104,.78); color:#fff2bd; background:linear-gradient(180deg,#876a2c,#5b421d); box-shadow:0 0 18px rgba(221,164,47,.12); }
 .v2-action-button:hover:not(:disabled) { filter:brightness(1.1); border-color:rgba(240,199,98,.7); }
 .v2-action-button:disabled { cursor:default; color:#708681; background:#10282b; opacity:.65; }
+.v2-action-step { margin-bottom:8px; padding:9px 10px; border:1px solid rgba(223,186,91,.24); border-radius:9px; color:#b9c8c2; background:rgba(8,28,30,.72); font-size:10px; line-height:1.55; }
+.v2-action-step strong { color:#ffe19a; }
+#app[data-activity="ai-thinking"] .v2-hand,
+#app[data-activity="ai-action"] .v2-hand,
+#app[data-activity="ai-finished"] .v2-hand { opacity:.58; filter:saturate(.72); }
+#app[data-activity="ai-thinking"] .v2-turn-banner,
+#app[data-activity="ai-action"] .v2-turn-banner { box-shadow:0 0 28px rgba(205,143,43,.18); }
 @media (max-width:1280px) { .v2-hand-card { width:min(98px,9.5vw); } .v2-player-row { padding:6px; } }
 @media (max-height:800px) { .v2-hand-card { width:min(92px,9vw); } .v2-preview-card img { max-height:135px; } }
