@@ -1,3 +1,4 @@
+import './presentation-discard.css';
 import { resolveCardAsset } from '../ui/card-assets.js';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
