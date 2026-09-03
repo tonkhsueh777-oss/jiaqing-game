@@ -55,6 +55,20 @@ test('stage model exposes physical draw and discard stacks with current counts',
   assert.equal(model.deck.discard.x > 0.8, true);
 });
 
+test('stage model exposes each player four-slot treasure collection state', () => {
+  const state = {
+    currentPlayerIndex: 0,
+    openedLocations: {},
+    players: [
+      { id: 'human', name: '玩家', position: 'center', treasures: { goldSeal: 1, sword: 0, gun: 2, pomelo: 1 } }
+    ]
+  };
+  const model = buildStageModel(state);
+  const human = model.players[0];
+  assert.deepEqual(human.treasures, { goldSeal: 1, sword: 0, gun: 2, pomelo: 1 });
+  assert.equal(human.treasureKinds, 3);
+});
+
 test('stage model exposes standard and low performance profiles', () => {
   const state = { currentPlayerIndex: 0, openedLocations: {}, players: [] };
   assert.equal(buildStageModel(state, { quality: 'standard' }).quality.particles, true);
