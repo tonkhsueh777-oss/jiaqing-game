@@ -4,6 +4,7 @@ import tainanUrl from '../../../assets/cards/03-tainan.jpg';
 import mengxiaUrl from '../../../assets/cards/04-mengxia.jpg';
 import zhuluoUrl from '../../../assets/cards/05-zhuluo.jpg';
 import madouUrl from '../../../assets/cards/06-madou.jpg';
+import cardBackUrl from '../../../assets/card-back.jpg';
 
 const LOCATION_ART = Object.freeze({
   tainan: tainanUrl,
@@ -135,6 +136,66 @@ function drawLocation(layer, width, height, location, texture) {
   layer.addChild(holder);
 }
 
+function drawDeckStacks(layer, width, height, deck, cardBackTexture) {
+  const stackW = Math.min(74, width * 0.075);
+  const stackH = stackW / 0.68;
+
+  function baseStack(point, count, label, accent) {
+    const holder = new Container();
+    holder.x = width * point.x;
+    holder.y = height * point.y;
+    const depth = Math.min(4, Math.max(1, Math.ceil(count / 10)));
+    for (let i = depth - 1; i >= 0; i -= 1) {
+      const card = new Graphics();
+      const offset = i * 3;
+      card.roundRect(-stackW / 2 + offset, -stackH / 2 + offset, stackW, stackH, 8)
+        .fill({ color: 0x092426, alpha: 0.98 })
+        .stroke({ color: accent, width: 1.4, alpha: 0.58 });
+      holder.addChild(card);
+    }
+    const plate = new Graphics();
+    plate.roundRect(-stackW * 0.55, stackH * 0.42, stackW * 1.1, 31, 8)
+      .fill({ color: 0x07191b, alpha: 0.94 })
+      .stroke({ color: accent, width: 1, alpha: 0.42 });
+    holder.addChild(plate);
+    const title = makeText(label, 10, '#d4bd7b', '900');
+    title.anchor.set(0.5);
+    title.y = stackH * 0.42 + 9;
+    holder.addChild(title);
+    const total = makeText(String(count), 13, '#ffe39a', '900');
+    total.anchor.set(0.5);
+    total.y = stackH * 0.42 + 22;
+    holder.addChild(total);
+    layer.addChild(holder);
+    return holder;
+  }
+
+  const draw = baseStack(deck.draw, deck.drawCount, '抽牌堆', 0xc6a34e);
+  if (cardBackTexture && deck.drawCount > 0) {
+    const sprite = new Sprite(cardBackTexture);
+    sprite.anchor.set(0.5);
+    const scale = Math.max(stackW / sprite.texture.width, stackH / sprite.texture.height);
+    sprite.scale.set(scale);
+    const mask = new Graphics();
+    mask.roundRect(-stackW / 2 + 2, -stackH / 2 + 2, stackW - 4, stackH - 4, 7).fill(0xffffff);
+    draw.addChild(mask);
+    sprite.mask = mask;
+    draw.addChild(sprite);
+  }
+
+  const discard = baseStack(deck.discard, deck.discardCount, '弃牌堆', 0x9d6e47);
+  const face = new Graphics();
+  face.roundRect(-stackW / 2 + 3, -stackH / 2 + 3, stackW - 6, stackH - 6, 7)
+    .fill({ color: deck.discardCount ? 0x4a3527 : 0x102a2c, alpha: 0.96 })
+    .stroke({ color: 0xd09862, width: 1, alpha: deck.discardCount ? 0.58 : 0.24 });
+  discard.addChild(face);
+  const discardName = makeText(deck.topDiscard?.name || '空', 9, deck.discardCount ? '#eed3a2' : '#718984', '800');
+  discardName.anchor.set(0.5);
+  discardName.style.wordWrap = true;
+  discardName.style.wordWrapWidth = stackW - 12;
+  discard.addChild(discardName);
+}
+
 function drawCenter(layer, width, height) {
   const cx = width * 0.5;
   const cy = height * 0.5;
@@ -262,6 +323,7 @@ export async function mountStage(host, session, options = {}) {
 
   const textures = {};
   for (const [key, url] of Object.entries(LOCATION_ART)) textures[key] = await Assets.load(url);
+  textures.cardBack = await Assets.load(cardBackUrl);
 
   function renderState(state, renderOptions = {}) {
     const qualityId = renderOptions.quality || options.quality || 'standard';
@@ -273,6 +335,7 @@ export async function mountStage(host, session, options = {}) {
     drawBackground(layer, width, height, model.quality);
     drawRoutes(layer, width, height, model.locations, model.activePlayerId);
     for (const location of model.locations) drawLocation(layer, width, height, location, textures[location.id]);
+    drawDeckStacks(layer, width, height, model.deck, textures.cardBack);
     drawCenter(layer, width, height);
     drawPlayers(layer, width, height, model.players, new Set(renderOptions.hiddenPlayerIds || []));
     return { model, width, height };
