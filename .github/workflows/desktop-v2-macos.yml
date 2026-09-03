@@ -1,0 +1,59 @@
+name: Build V2 Mac Universal
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - v2-mac-desktop
+    paths:
+      - 'desktop-v2/**'
+      - '.github/workflows/desktop-v2-macos.yml'
+
+jobs:
+  build-macos-universal:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: desktop-v2
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: desktop-v2/src-tauri -> target
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Run V2 unit tests
+        run: npm test
+
+      - name: Build V2 frontend
+        run: npm run build
+
+      - name: Build Universal Mac app
+        run: npm run desktop:build:mac -- --no-sign
+
+      - name: Verify universal architecture
+        run: |
+          APP_BINARY=$(find src-tauri/target/universal-apple-darwin/release/bundle/macos -type f -path '*.app/Contents/MacOS/*' | head -n 1)
+          test -n "$APP_BINARY"
+          file "$APP_BINARY" | tee /tmp/v2-arch.txt
+          grep -q 'x86_64' /tmp/v2-arch.txt
+          grep -q 'arm64' /tmp/v2-arch.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jiaqing-game-v2-macos-universal
+          path: |
+            desktop-v2/src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+            desktop-v2/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
