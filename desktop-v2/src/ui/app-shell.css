@@ -37,8 +37,24 @@ button { font: inherit; }
 .v2-stage { position: relative; overflow: hidden; min-height: 0; background:
   radial-gradient(circle at 50% 46%, rgba(188,151,64,.12), transparent 26%),
   linear-gradient(180deg, rgba(17,55,56,.93), rgba(5,25,28,.98)); }
-.v2-stage::after { content:""; pointer-events:none; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.18),transparent 18%,transparent 80%,rgba(0,0,0,.23)); }
-.v2-stage-canvas-host { position:absolute; inset:0; }
+.v2-stage::before {
+  content:"";
+  pointer-events:none;
+  position:absolute;
+  z-index:1;
+  inset:7%;
+  background:
+    radial-gradient(circle at 50% 17%, rgba(238,194,91,.17), transparent 12%),
+    radial-gradient(circle at 22% 50%, rgba(223,176,76,.13), transparent 13%),
+    radial-gradient(circle at 78% 50%, rgba(223,176,76,.13), transparent 13%),
+    radial-gradient(circle at 50% 82%, rgba(238,194,91,.15), transparent 12%);
+  opacity:.52;
+  filter:blur(7px);
+  transform:scale(.985);
+  animation:v2StageBreath 4.8s ease-in-out infinite;
+}
+.v2-stage::after { content:""; pointer-events:none; position:absolute; z-index:3; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.18),transparent 18%,transparent 80%,rgba(0,0,0,.23)); }
+.v2-stage-canvas-host { position:absolute; z-index:2; inset:0; }
 .v2-stage-canvas { width:100%; height:100%; display:block; }
 .v2-stage-topline { position:absolute; z-index:4; left:18px; right:18px; top:14px; display:flex; justify-content:center; align-items:flex-start; pointer-events:none; }
 .v2-turn-banner { pointer-events:none; min-width:180px; padding:8px 24px 9px; text-align:center; border:1px solid rgba(236,190,87,.72); border-radius:14px; color:#ffe9a7; background:linear-gradient(180deg,rgba(36,31,21,.92),rgba(12,23,22,.92)); box-shadow:0 7px 22px rgba(0,0,0,.34),0 0 26px rgba(225,170,54,.12); }
@@ -56,6 +72,11 @@ button { font: inherit; }
 .v2-utility-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
 .v2-button { min-height:44px; border:1px solid rgba(222,188,105,.55); border-radius:10px; color:#fff1c2; background:linear-gradient(180deg,#6f592a,#453718); cursor:pointer; }
 .v2-button:hover { filter:brightness(1.08); }
+@keyframes v2StageBreath {
+  0%,100% { opacity:.38; transform:scale(.982); filter:blur(7px); }
+  50% { opacity:.66; transform:scale(1.018); filter:blur(10px); }
+}
+[data-quality="low"] .v2-stage::before { animation:none; opacity:.16; filter:none; transform:none; }
 [data-quality="low"] .v2-stage::after { background:linear-gradient(180deg,rgba(0,0,0,.12),transparent 18%,transparent 84%,rgba(0,0,0,.18)); }
 @media (max-width: 1280px) {
   .v2-shell { grid-template-columns: 210px minmax(0,1fr) 240px; gap: 8px; padding: 8px; }
