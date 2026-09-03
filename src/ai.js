@@ -161,16 +161,32 @@
       }
     }
 
-    const leaders = view.players
+    const opponentsByThreat = view.players
       .filter(p => p.id !== playerId)
-      .map(p => ({ id: p.id, kinds: game.countTreasureKinds(p) }))
-      .filter(p => p.kinds >= 3)
-      .sort((a, b) => b.kinds - a.kinds || a.id.localeCompare(b.id));
+      .map(p => ({ ...p, kinds: game.countTreasureKinds(p) }))
+      .sort((a, b) => b.kinds - a.kinds || b.handCount - a.handCount || a.id.localeCompare(b.id));
+    const leaders = opponentsByThreat.filter(p => p.kinds >= 3);
     const tacticCards = ownHand.filter(card => card.type === 'tactic');
-    if (leaders.length && tacticCards.length) {
-      candidates.push(candidate(SCORE.tacticLeader, {
-        type: 'tactic', runtimeId: tacticCards[0].runtimeId, targetPlayerId: leaders[0].id
-      }, playerId));
+    for (const tacticCard of tacticCards) {
+      if (tacticCard.key === 'bully' && leaders.length) {
+        candidates.push(candidate(SCORE.tacticLeader, {
+          type: 'tactic', runtimeId: tacticCard.runtimeId, targetPlayerId: leaders[0].id
+        }, playerId));
+      } else if (tacticCard.key === 'fire') {
+        const target = opponentsByThreat.find(p => p.handCount > 0);
+        if (target) candidates.push(candidate(SCORE.tacticLeader - 80, {
+          type: 'tactic', runtimeId: tacticCard.runtimeId, targetPlayerId: target.id
+        }, playerId));
+      } else if (tacticCard.key === 'flower') {
+        const target = opponentsByThreat.find(p => {
+          if (p.position === 'center' || p.position === self.position) return false;
+          const loc = game.LOCATIONS[p.position];
+          return loc && missing.has(loc.treasure) && view.treasureStock[loc.treasure] > 0;
+        });
+        if (target) candidates.push(candidate(SCORE.tacticLeader - 30, {
+          type: 'tactic', runtimeId: tacticCard.runtimeId, targetPlayerId: target.id
+        }, playerId));
+      }
     }
 
     for (const trumpCard of trumpCards) {
@@ -193,7 +209,6 @@
       default: return { ok: false, message: '结束行动。' };
     }
   }
-
 
   function discardValue(card, state, player) {
     if (card.type === 'trump') return 100;
