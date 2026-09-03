@@ -34,9 +34,14 @@ export function buildStageModel(state, options = {}) {
     };
   });
 
+  const locations = Object.values(STAGE_LAYOUT.locations).map(location => ({
+    ...location,
+    opened: Boolean(state?.openedLocations?.[location.id])
+  }));
+
   return {
     center: STAGE_LAYOUT.center,
-    locations: Object.values(STAGE_LAYOUT.locations),
+    locations,
     players,
     activePlayerId: state?.players?.[state.currentPlayerIndex]?.id || null,
     quality
