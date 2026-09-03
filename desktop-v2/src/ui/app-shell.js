@@ -23,6 +23,7 @@ export function shellMarkup() {
             </div>
           </div>
           <div id="v2-stage-canvas-host" class="v2-stage-canvas-host"></div>
+          <div id="v2-stage-guidance" class="v2-stage-guidance" aria-hidden="true"></div>
         </div>
         <div id="v2-hand" class="v2-hand" aria-label="玩家手牌">
           <div class="v2-hand__label">玩家手牌</div>
