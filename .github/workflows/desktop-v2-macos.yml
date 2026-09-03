@@ -9,6 +9,10 @@ on:
       - 'desktop-v2/**'
       - '.github/workflows/desktop-v2-macos.yml'
 
+concurrency:
+  group: desktop-v2-macos-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-macos-universal:
     runs-on: macos-latest
