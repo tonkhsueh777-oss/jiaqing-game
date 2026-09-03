@@ -13,6 +13,10 @@ const TITLES = Object.freeze({
   discard: ['弃牌', '手牌进入弃牌堆']
 });
 
+const TREASURES = Object.freeze([
+  ['goldSeal', '金印'], ['sword', '宝剑'], ['gun', '火枪'], ['pomelo', '柚子']
+]);
+
 function qualityDuration(root, standard, low) {
   return root.dataset.quality === 'low' ? low : standard;
 }
@@ -36,6 +40,14 @@ function cardLike(effect) {
     type: effect.cardType,
     key: effect.cardKey,
     locationId: effect.locationId
+  };
+}
+
+function burnedCardLike(effect) {
+  return {
+    type: effect.burnedCardType,
+    key: effect.burnedCardKey,
+    locationId: effect.burnedLocationId
   };
 }
 
@@ -73,6 +85,13 @@ function detailFor(effect) {
   return TITLES[effect.kind]?.[1] || '';
 }
 
+function extraEffectMarkup(effect) {
+  if (effect.kind !== 'burn') return '';
+  const src = resolveCardAsset(burnedCardLike(effect));
+  if (!src) return '';
+  return `<div class="v2-burned-card-wrap"><img class="v2-burned-card" src="${src}" alt="${effect.burnedCardName}"></div>`;
+}
+
 async function showEffectBanner(root, overlay, effect, stagePromise) {
   if (!overlay) {
     await stagePromise;
@@ -81,6 +100,7 @@ async function showEffectBanner(root, overlay, effect, stagePromise) {
   const [title] = TITLES[effect.kind] || [effect.cardName || '御前行动'];
   overlay.className = `v2-presentation-overlay is-active is-effect is-${effect.kind}`;
   overlay.innerHTML = `
+    ${extraEffectMarkup(effect)}
     <div class="v2-effect-banner">
       <small>${effect.cardName && effect.cardName !== title ? effect.cardName : '御前战局'}</small>
       <strong>${title}</strong>
@@ -95,7 +115,32 @@ async function showEffectBanner(root, overlay, effect, stagePromise) {
   clearOverlay(overlay);
 }
 
-export function createPresentationDirector({ root, stage }) {
+function treasureStrip() {
+  return TREASURES.map(([id, label]) => {
+    const src = resolveCardAsset({ key: id });
+    return `<div class="v2-endgame-treasure">${src ? `<img src="${src}" alt="${label}">` : ''}<span>${label}</span></div>`;
+  }).join('');
+}
+
+async function showEndgame(root, overlay, effect) {
+  if (!overlay) return;
+  const victory = effect.kind === 'victory';
+  overlay.className = `v2-presentation-overlay is-active is-endgame ${victory ? 'is-victory' : 'is-defeat'}`;
+  overlay.innerHTML = `
+    <div class="v2-endgame-shade"></div>
+    <div class="v2-endgame-panel">
+      <small>${victory ? '四宝齐聚 · 御前定胜' : '牌局终了 · 对手捷足先登'}</small>
+      <strong>${victory ? '御前大胜' : '挑战失败'}</strong>
+      <p>${victory ? '你率先集齐四类宝物。' : `${effect.winnerName}率先集齐四类宝物。`}</p>
+      <div class="v2-endgame-treasures">${treasureStrip()}</div>
+    </div>`;
+  await sleep(qualityDuration(root, 2300, 1200));
+  overlay.classList.add('is-leaving');
+  await sleep(qualityDuration(root, 260, 100));
+  clearOverlay(overlay);
+}
+
+export function createPresentationDirector({ root, stage, audio = null }) {
   if (!root || !stage) throw new Error('presentation director requires root and stage');
   const overlay = ensureOverlay(root);
 
@@ -103,8 +148,13 @@ export function createPresentationDirector({ root, stage }) {
     const beforeState = event.beforeState || event.state;
     const afterState = event.state;
     for (const effect of sequence || []) {
+      if (audio?.playPresentation) void audio.playPresentation(effect);
       if (effect.kind === 'card-reveal') {
         await showCardReveal(root, overlay, effect);
+        continue;
+      }
+      if (effect.kind === 'victory' || effect.kind === 'defeat') {
+        await showEndgame(root, overlay, effect);
         continue;
       }
       const stagePromise = typeof stage.present === 'function'
