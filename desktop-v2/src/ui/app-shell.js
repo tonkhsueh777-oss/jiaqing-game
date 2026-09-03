@@ -35,6 +35,8 @@ export function shellMarkup() {
         <section class="v2-section v2-guide"><span>行动说明</span><div id="v2-action-guide">读取牌局后显示可执行动作。</div></section>
         <section class="v2-section"><span>可执行动作</span><div id="v2-actions" class="v2-actions"></div></section>
         <div class="v2-utility-actions">
+          <button class="v2-button" type="button" data-action="save-game">保存牌局</button>
+          <button class="v2-button v2-button--danger" type="button" data-action="new-game">重新开始</button>
           <button class="v2-button" type="button" data-action="toggle-sound">音效：开</button>
           <button class="v2-button" type="button" data-action="toggle-fullscreen">切换全屏</button>
         </div>
