@@ -1,5 +1,5 @@
 import { Application, Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
-import { buildStageModel } from './stage-model.js';
+import { buildStageModel, STAGE_LAYOUT } from './stage-model.js';
 import tainanUrl from '../../../assets/cards/03-tainan.jpg';
 import mengxiaUrl from '../../../assets/cards/04-mengxia.jpg';
 import zhuluoUrl from '../../../assets/cards/05-zhuluo.jpg';
@@ -16,6 +16,14 @@ const PLAYER_STYLE = Object.freeze({
   human: { fill: 0xd8aa3d, edge: 0xffe39a, label: '我' },
   ai1: { fill: 0xa93e32, edge: 0xff8779, label: '甲' },
   ai2: { fill: 0x3b8ca8, edge: 0x8bdfff, label: '乙' }
+});
+
+const EFFECT_STYLE = Object.freeze({
+  burn: { color: 0xd45c35, label: '火烧 · 手牌焚毁' },
+  lock: { color: 0xc9a24b, label: '计策封锁 · 跳过回合' },
+  treasure: { color: 0xf0c75e, label: '明察得宝' },
+  'location-open': { color: 0xd9bd73, label: '地点开放' },
+  'treasure-swap': { color: 0xe6c46d, label: '御令 · 宝物交换' }
 });
 
 function sizeOf(host) {
@@ -123,9 +131,25 @@ function drawCenter(layer, width, height) {
   layer.addChild(title);
 }
 
-function drawPlayers(layer, width, height, players) {
+function createPlayerToken(playerId, active = false) {
+  const style = PLAYER_STYLE[playerId] || PLAYER_STYLE.ai2;
+  const holder = new Container();
+  const token = new Graphics();
+  if (active) token.circle(0, 0, 27).fill({ color: style.edge, alpha: 0.18 });
+  token.circle(0, 0, 19).fill({ color: style.fill, alpha: 1 }).stroke({ color: style.edge, width: active ? 4 : 2, alpha: 1 });
+  token.roundRect(-16, 15, 32, 13, 6).fill({ color: 0x101516, alpha: 0.92 });
+  holder.addChild(token);
+  const label = makeText(style.label, 16, '#fff6df', '900');
+  label.anchor.set(0.5);
+  label.y = -1;
+  holder.addChild(label);
+  return holder;
+}
+
+function drawPlayers(layer, width, height, players, hiddenIds = new Set()) {
   const grouped = new Map();
   for (const player of players) {
+    if (hiddenIds.has(player.id)) continue;
     const key = `${player.slot}:${player.position}`;
     if (!grouped.has(key)) grouped.set(key, []);
     grouped.get(key).push(player);
@@ -133,22 +157,72 @@ function drawPlayers(layer, width, height, players) {
 
   for (const group of grouped.values()) {
     group.forEach((player, index) => {
-      const style = PLAYER_STYLE[player.id] || PLAYER_STYLE.ai2;
       const spread = (index - (group.length - 1) / 2) * 44;
-      const x = width * player.x + spread;
-      const y = height * player.y - 8;
-      const token = new Graphics();
-      if (player.active) token.circle(x, y, 27).fill({ color: style.edge, alpha: 0.18 });
-      token.circle(x, y, 19).fill({ color: style.fill, alpha: 1 }).stroke({ color: style.edge, width: player.active ? 4 : 2, alpha: 1 });
-      token.roundRect(x - 16, y + 15, 32, 13, 6).fill({ color: 0x101516, alpha: 0.92 });
-      layer.addChild(token);
-      const label = makeText(style.label, 16, '#fff6df', '900');
-      label.anchor.set(0.5);
-      label.x = x;
-      label.y = y - 1;
-      layer.addChild(label);
+      const holder = createPlayerToken(player.id, player.active);
+      holder.x = width * player.x + spread;
+      holder.y = height * player.y - 8;
+      layer.addChild(holder);
     });
   }
+}
+
+function stagePoint(position, width, height) {
+  const slot = position === 'center' ? STAGE_LAYOUT.center : (STAGE_LAYOUT.locations[position] || STAGE_LAYOUT.center);
+  return { x: width * slot.x, y: height * slot.y - 8 };
+}
+
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function tween(duration, update) {
+  return new Promise(resolve => {
+    const start = performance.now();
+    function frame(now) {
+      const raw = Math.min(1, (now - start) / Math.max(1, duration));
+      update(easeOutCubic(raw), raw);
+      if (raw >= 1) resolve();
+      else requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function animateToken(app, playerId, from, to, width, height, duration, arc = 28) {
+  const holder = createPlayerToken(playerId, true);
+  const start = stagePoint(from, width, height);
+  const end = stagePoint(to, width, height);
+  holder.x = start.x;
+  holder.y = start.y;
+  app.stage.addChild(holder);
+  await tween(duration, (eased, raw) => {
+    holder.x = start.x + (end.x - start.x) * eased;
+    holder.y = start.y + (end.y - start.y) * eased - Math.sin(Math.PI * raw) * arc;
+    holder.scale.set(1 + Math.sin(Math.PI * raw) * 0.12);
+  });
+  holder.destroy({ children: true });
+}
+
+async function pulseEffect(app, point, effect, quality) {
+  const style = EFFECT_STYLE[effect.kind] || EFFECT_STYLE['location-open'];
+  const holder = new Container();
+  holder.x = point.x;
+  holder.y = point.y;
+  const ring = new Graphics();
+  ring.circle(0, 0, 34).fill({ color: style.color, alpha: 0.13 }).stroke({ color: style.color, width: 4, alpha: 0.9 });
+  ring.circle(0, 0, 48).stroke({ color: style.color, width: 2, alpha: 0.45 });
+  holder.addChild(ring);
+  const label = makeText(style.label, 14, '#fff0bd', '900');
+  label.anchor.set(0.5);
+  label.y = -58;
+  holder.addChild(label);
+  app.stage.addChild(holder);
+  const duration = quality === 'low' ? 300 : 620;
+  await tween(duration, (eased, raw) => {
+    holder.scale.set(0.78 + eased * 0.48);
+    holder.alpha = raw < 0.68 ? 1 : Math.max(0, 1 - (raw - 0.68) / 0.32);
+  });
+  holder.destroy({ children: true });
 }
 
 export async function mountStage(host, session, options = {}) {
@@ -166,8 +240,9 @@ export async function mountStage(host, session, options = {}) {
   const textures = {};
   for (const [key, url] of Object.entries(LOCATION_ART)) textures[key] = await Assets.load(url);
 
-  function render(state, renderOptions = {}) {
-    const model = buildStageModel(state, { quality: renderOptions.quality || options.quality || 'standard' });
+  function renderState(state, renderOptions = {}) {
+    const qualityId = renderOptions.quality || options.quality || 'standard';
+    const model = buildStageModel(state, { quality: qualityId });
     const { width, height } = sizeOf(host);
     app.stage.removeChildren();
     const layer = new Container();
@@ -176,12 +251,73 @@ export async function mountStage(host, session, options = {}) {
     drawRoutes(layer, width, height, model.locations, model.activePlayerId);
     for (const location of model.locations) drawLocation(layer, width, height, location, textures[location.id]);
     drawCenter(layer, width, height);
-    drawPlayers(layer, width, height, model.players);
+    drawPlayers(layer, width, height, model.players, new Set(renderOptions.hiddenPlayerIds || []));
+    return { model, width, height };
+  }
+
+  function render(state, renderOptions = {}) {
+    renderState(state, renderOptions);
+  }
+
+  async function present(effect, beforeState, afterState, renderOptions = {}) {
+    const quality = renderOptions.quality || options.quality || 'standard';
+    const motionScale = quality === 'low' ? 0.55 : 1;
+    const duration = Math.round(620 * motionScale);
+
+    if (effect.kind === 'move') {
+      const { width, height } = renderState(beforeState, { quality, hiddenPlayerIds: [effect.playerId] });
+      await animateToken(app, effect.playerId, effect.from, effect.to, width, height, duration, 34 * motionScale);
+      renderState(afterState, { quality });
+      return;
+    }
+
+    if (effect.kind === 'swap') {
+      const { width, height } = renderState(beforeState, { quality, hiddenPlayerIds: [effect.playerId, effect.targetPlayerId] });
+      await Promise.all([
+        animateToken(app, effect.playerId, effect.from, effect.to, width, height, duration, 42 * motionScale),
+        animateToken(app, effect.targetPlayerId, effect.targetFrom, effect.targetTo, width, height, duration, -42 * motionScale)
+      ]);
+      renderState(afterState, { quality });
+      return;
+    }
+
+    const { width, height } = renderState(afterState, { quality });
+    if (effect.kind === 'burn' || effect.kind === 'lock') {
+      const target = playerById(afterState, effect.targetPlayerId);
+      const point = stagePoint(target?.position || 'center', width, height);
+      await pulseEffect(app, point, effect, quality);
+      renderState(afterState, { quality });
+      return;
+    }
+
+    if (effect.kind === 'treasure' || effect.kind === 'location-open') {
+      const point = stagePoint(effect.locationId || 'center', width, height);
+      await pulseEffect(app, point, effect, quality);
+      renderState(afterState, { quality });
+      return;
+    }
+
+    if (effect.kind === 'treasure-swap') {
+      const player = playerById(afterState, effect.playerId);
+      const target = playerById(afterState, effect.targetPlayerId);
+      const a = stagePoint(player?.position || 'center', width, height);
+      const b = stagePoint(target?.position || 'center', width, height);
+      await Promise.all([
+        pulseEffect(app, a, effect, quality),
+        pulseEffect(app, b, effect, quality)
+      ]);
+      renderState(afterState, { quality });
+    }
   }
 
   render(session.state);
   return {
     render,
+    present,
     destroy() { app.destroy(true, { children: true, texture: false }); }
   };
+}
+
+function playerById(state, playerId) {
+  return state?.players?.find(player => player.id === playerId) || null;
 }
