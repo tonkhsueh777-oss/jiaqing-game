@@ -85,41 +85,97 @@ function drawRoutes(layer, width, height, locations, activePlayerId) {
   layer.addChild(routes);
 }
 
-function drawLocation(layer, width, height, location, texture) {
+function drawLocationPedestal(holder, cardW, cardH, location, quality) {
+  const stage = location.stage || { pedestalDepth: 14, revealLift: 36, tilt: 0.02, sceneScale: 1.06 };
+  const depthLayers = quality.id === 'low' ? 2 : 4;
+  const layerStep = Math.max(3, stage.pedestalDepth / depthLayers);
+
+  const floorShadow = new Graphics();
+  floorShadow.ellipse(7, cardH * 0.47 + stage.pedestalDepth, cardW * 0.60, cardH * 0.17)
+    .fill({ color: 0x000000, alpha: quality.shadows ? 0.34 : 0.18 });
+  holder.addChild(floorShadow);
+
+  for (let i = depthLayers; i >= 1; i -= 1) {
+    const depth = i * layerStep;
+    const slab = new Graphics();
+    slab.roundRect(-cardW / 2 + 5, -cardH / 2 + depth, cardW - 10, cardH, 16)
+      .fill({ color: i === 1 ? 0x604920 : 0x2d2a20, alpha: 0.98 })
+      .stroke({ color: 0xb28b43, width: 1.2, alpha: 0.30 + i * 0.06 });
+    holder.addChild(slab);
+  }
+
+  if (location.opened && quality.glow > 0.7) {
+    const halo = new Graphics();
+    halo.ellipse(0, -cardH * 0.10, cardW * 0.58, cardH * 0.46)
+      .fill({ color: 0xf0c86c, alpha: 0.055 })
+      .stroke({ color: 0xe9bc58, width: 2, alpha: 0.16 });
+    holder.addChild(halo);
+  }
+}
+
+function drawLocation(layer, width, height, location, texture, quality) {
   const x = width * location.x;
   const y = height * location.y;
   const landscape = location.slot === 'east' || location.slot === 'west';
   const cardW = Math.min(width * (landscape ? 0.19 : 0.175), 245);
   const cardH = Math.min(height * (landscape ? 0.29 : 0.25), 190);
+  const stage = location.stage || { pedestalDepth: 14, revealLift: 36, tilt: 0.02, sceneScale: 1.06 };
 
   const holder = new Container();
   holder.x = x;
-  holder.y = y;
+  holder.y = y - (location.opened ? stage.revealLift * 0.10 : 0);
+  holder.rotation = location.opened ? stage.tilt : stage.tilt * 0.25;
+
+  drawLocationPedestal(holder, cardW, cardH, location, quality);
 
   const shadow = new Graphics();
-  shadow.roundRect(-cardW / 2 + 8, -cardH / 2 + 12, cardW, cardH, 18).fill({ color: 0x000000, alpha: 0.38 });
+  shadow.roundRect(-cardW / 2 + 9, -cardH / 2 + 14, cardW, cardH, 18)
+    .fill({ color: 0x000000, alpha: quality.shadows ? 0.42 : 0.24 });
   holder.addChild(shadow);
 
   const frame = new Graphics();
   frame.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 18)
-    .fill({ color: location.opened ? 0x1b241d : 0x0c2426, alpha: 0.96 })
-    .stroke({ color: location.opened ? 0xd4a64c : 0x8b7440, width: 3, alpha: location.opened ? 0.8 : 0.62 });
+    .fill({ color: location.opened ? 0x1b241d : 0x0c2426, alpha: 0.98 })
+    .stroke({ color: location.opened ? 0xe0b65b : 0x8b7440, width: location.opened ? 3.5 : 2.5, alpha: location.opened ? 0.92 : 0.62 });
   holder.addChild(frame);
+
+  const innerRim = new Graphics();
+  innerRim.roundRect(-cardW / 2 + 6, -cardH / 2 + 6, cardW - 12, cardH - 12, 13)
+    .stroke({ color: location.opened ? 0x7d5a24 : 0x5d593f, width: 1.3, alpha: 0.65 });
+  holder.addChild(innerRim);
 
   const targetW = cardW - 14;
   const targetH = cardH - 40;
 
   if (location.opened) {
+    const scene = new Container();
+    scene.y = -12;
+    scene.scale.set(stage.sceneScale);
+
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
     const scale = Math.max(targetW / sprite.texture.width, targetH / sprite.texture.height);
     sprite.scale.set(scale);
     const mask = new Graphics();
-    mask.roundRect(-targetW / 2, -targetH / 2 - 12, targetW, targetH, 12).fill(0xffffff);
-    holder.addChild(mask);
+    mask.roundRect(-targetW / 2, -targetH / 2, targetW, targetH, 12).fill(0xffffff);
+    scene.addChild(mask);
     sprite.mask = mask;
-    sprite.y = -12;
-    holder.addChild(sprite);
+    scene.addChild(sprite);
+
+    if (quality.glow > 0.7) {
+      const topLight = new Graphics();
+      topLight.roundRect(-targetW * 0.46, -targetH * 0.45, targetW * 0.92, targetH * 0.20, 10)
+        .fill({ color: 0xffe8a1, alpha: 0.07 });
+      scene.addChild(topLight);
+    }
+
+    holder.addChild(scene);
+
+    const frontLip = new Graphics();
+    frontLip.roundRect(-cardW * 0.43, cardH * 0.34, cardW * 0.86, 12, 6)
+      .fill({ color: 0x765724, alpha: 0.98 })
+      .stroke({ color: 0xe3ba61, width: 1, alpha: 0.68 });
+    holder.addChild(frontLip);
   } else {
     const back = new Graphics();
     back.roundRect(-targetW / 2, -targetH / 2 - 12, targetW, targetH, 12)
@@ -414,6 +470,59 @@ async function animateTreasure(app, texture, treasureId, start, end, duration, a
   holder.destroy({ children: true });
 }
 
+async function animateLocationReveal(app, texture, location, point, quality) {
+  const stage = location?.stage || { revealLift: 42, tilt: 0.03, sceneScale: 1.08 };
+  const holder = new Container();
+  holder.x = point.x;
+  holder.y = point.y + (quality === 'low' ? 16 : 28);
+  holder.rotation = stage.tilt * 0.25;
+
+  const glow = new Graphics();
+  glow.ellipse(0, 12, 88, 52).fill({ color: 0xf0c86c, alpha: quality === 'low' ? 0.08 : 0.15 });
+  glow.ellipse(0, 12, 72, 42).stroke({ color: 0xf3ce74, width: 2, alpha: 0.52 });
+  holder.addChild(glow);
+
+  const frame = new Graphics();
+  frame.roundRect(-58, -44, 116, 88, 12)
+    .fill({ color: 0x162523, alpha: 0.98 })
+    .stroke({ color: 0xe0b65b, width: 3, alpha: 0.92 });
+  holder.addChild(frame);
+
+  if (texture) {
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    const targetW = 106;
+    const targetH = 70;
+    const scale = Math.max(targetW / sprite.texture.width, targetH / sprite.texture.height);
+    sprite.scale.set(scale * stage.sceneScale);
+    const mask = new Graphics();
+    mask.roundRect(-targetW / 2, -targetH / 2, targetW, targetH, 9).fill(0xffffff);
+    holder.addChild(mask);
+    sprite.mask = mask;
+    holder.addChild(sprite);
+  }
+
+  const label = makeText(location?.name || '地点揭示', 12, '#ffe5a2', '900');
+  label.anchor.set(0.5);
+  label.y = 58;
+  holder.addChild(label);
+  app.stage.addChild(holder);
+
+  const duration = quality === 'low' ? 360 : 760;
+  const lift = stage.revealLift * (quality === 'low' ? 0.45 : 0.72);
+  await tween(duration, (eased, raw) => {
+    holder.y = point.y + (quality === 'low' ? 16 : 28) - lift * eased;
+    holder.rotation = stage.tilt * (0.25 + eased * 0.75);
+    holder.scale.set(0.76 + eased * 0.28 + Math.sin(Math.PI * raw) * 0.04);
+    glow.alpha = 0.58 + Math.sin(Math.PI * raw) * 0.42;
+  });
+  await tween(quality === 'low' ? 90 : 150, (eased) => {
+    holder.y += eased * 5;
+    holder.alpha = 1 - eased;
+  });
+  holder.destroy({ children: true });
+}
+
 async function pulseEffect(app, point, effect, quality) {
   const style = EFFECT_STYLE[effect.kind] || EFFECT_STYLE['location-open'];
   const holder = new Container();
@@ -464,7 +573,7 @@ export async function mountStage(host, session, options = {}) {
     app.stage.addChild(layer);
     drawBackground(layer, width, height, model.quality);
     drawRoutes(layer, width, height, model.locations, model.activePlayerId);
-    for (const location of model.locations) drawLocation(layer, width, height, location, textures[location.id]);
+    for (const location of model.locations) drawLocation(layer, width, height, location, textures[location.id], model.quality);
     drawDeckStacks(layer, width, height, model.deck, textures.cardBack);
     drawCenter(layer, width, height);
     drawPlayers(layer, width, height, model.players, treasureTextures, new Set(renderOptions.hiddenPlayerIds || []));
@@ -502,7 +611,10 @@ export async function mountStage(host, session, options = {}) {
 
     if (effect.kind === 'location-open') {
       const { width, height } = renderState(beforeState, { quality });
+      const location = STAGE_LAYOUT.locations[effect.locationId] || STAGE_LAYOUT.locations.tainan;
       const point = stagePoint(effect.locationId || 'center', width, height);
+      await animateLocationReveal(app, textures[effect.locationId], location, point, quality);
+      renderState(afterState, { quality });
       await pulseEffect(app, point, effect, quality);
       renderState(afterState, { quality });
       return;
