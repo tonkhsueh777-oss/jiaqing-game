@@ -4,6 +4,10 @@ function activePlayer(state) {
   return state?.players?.[state.currentPlayerIndex] || null;
 }
 
+function handCount(state, playerId) {
+  return state?.players?.find(player => player.id === playerId)?.hand?.length || 0;
+}
+
 export function createTurnController({
   adapter,
   session,
@@ -35,8 +39,9 @@ export function createTurnController({
       if (!current) break;
 
       if (session.state.phase !== 'action' && session.state.phase !== 'discard') {
+        const beforeTurnState = snapshot();
         const result = adapter.beginTurn(session.state);
-        await emit('turn-start', { playerId: current.id, result });
+        await emit('turn-start', { playerId: current.id, result, beforeState: beforeTurnState });
         if (result?.skipped) {
           await delay(Math.min(220, aiDelayMs));
           continue;
@@ -62,6 +67,7 @@ export function createTurnController({
       await emit('ai-thinking', { playerId: current.id });
       await delay(aiDelayMs);
       const beforeAiState = snapshot();
+      let afterAiActionState = null;
       await adapter.runAiTurn(session.state, current.id, {
         afterAction: async (decision, state, result) => {
           await emit('ai-action', {
@@ -70,9 +76,22 @@ export function createTurnController({
             result,
             beforeState: beforeAiState
           });
+          afterAiActionState = snapshot();
           await delay(Math.max(120, Math.round(aiDelayMs * 0.55)));
         }
       });
+
+      if (afterAiActionState) {
+        const drawCount = Math.max(0, handCount(session.state, current.id) - handCount(afterAiActionState, current.id));
+        if (drawCount > 0) {
+          await emit('ai-refill', {
+            playerId: current.id,
+            beforeState: afterAiActionState,
+            result: { ok: true, cards: Array.from({ length: drawCount }, () => null) }
+          });
+        }
+      }
+
       await emit('ai-finished', { playerId: current.id });
       await persist();
     }
@@ -130,11 +149,19 @@ export function createTurnController({
     await emit('human-action', { action: input, result, beforeState });
     if (!session.state.winnerId) {
       if (input.type === 'swapPass') {
-        // V43 swap-pass already advances the turn.
+        // V43 swap-pass performs its own replacement draw and advances the turn.
       } else if (input.type === 'discard' && session.state.phase === 'discard') {
         if (adapter.finishDiscard && !adapter.mustDiscard?.(session.state, 'human')) adapter.finishDiscard(session.state);
       } else {
-        adapter.completeTurn(session.state);
+        const beforeRefillState = snapshot();
+        const refillResult = adapter.completeTurn(session.state);
+        if (refillResult?.cards?.length) {
+          await emit('human-refill', {
+            playerId: 'human',
+            beforeState: beforeRefillState,
+            result: refillResult
+          });
+        }
       }
     }
 
