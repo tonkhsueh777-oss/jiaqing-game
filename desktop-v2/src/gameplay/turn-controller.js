@@ -15,8 +15,12 @@ export function createTurnController({
 
   let busy = false;
 
-  function emit(type, detail = {}) {
-    onChange({ type, ...detail, state: session.state });
+  function snapshot() {
+    return adapter.snapshot ? adapter.snapshot(session.state) : structuredClone(session.state);
+  }
+
+  async function emit(type, detail = {}) {
+    await Promise.resolve(onChange({ type, ...detail, state: snapshot() }));
   }
 
   async function persist() {
@@ -32,7 +36,7 @@ export function createTurnController({
 
       if (session.state.phase !== 'action' && session.state.phase !== 'discard') {
         const result = adapter.beginTurn(session.state);
-        emit('turn-start', { playerId: current.id, result });
+        await emit('turn-start', { playerId: current.id, result });
         if (result?.skipped) {
           await delay(Math.min(220, aiDelayMs));
           continue;
@@ -43,33 +47,39 @@ export function createTurnController({
       if (!current) break;
       if (current.id === 'human') {
         busy = false;
-        emit('human-ready', { playerId: current.id });
+        await emit('human-ready', { playerId: current.id });
         await persist();
         return;
       }
 
       if (current.kind !== 'ai') {
         busy = false;
-        emit('turn-ready', { playerId: current.id });
+        await emit('turn-ready', { playerId: current.id });
         return;
       }
 
       busy = true;
-      emit('ai-thinking', { playerId: current.id });
+      await emit('ai-thinking', { playerId: current.id });
       await delay(aiDelayMs);
+      const beforeAiState = snapshot();
       await adapter.runAiTurn(session.state, current.id, {
         afterAction: async (decision, state, result) => {
-          emit('ai-action', { playerId: current.id, decision, result });
+          await emit('ai-action', {
+            playerId: current.id,
+            decision,
+            result,
+            beforeState: beforeAiState
+          });
           await delay(Math.max(120, Math.round(aiDelayMs * 0.55)));
         }
       });
-      emit('ai-finished', { playerId: current.id });
+      await emit('ai-finished', { playerId: current.id });
       await persist();
     }
 
     busy = false;
     if (session.state.winnerId) {
-      emit('winner', { winnerId: session.state.winnerId });
+      await emit('winner', { winnerId: session.state.winnerId });
       await persist();
       return;
     }
@@ -109,14 +119,15 @@ export function createTurnController({
     }
 
     busy = true;
+    const beforeState = snapshot();
     const result = playHuman(input);
     if (!result?.ok) {
       busy = false;
-      emit('human-error', { result });
+      await emit('human-error', { result });
       return result;
     }
 
-    emit('human-action', { action: input, result });
+    await emit('human-action', { action: input, result, beforeState });
     if (!session.state.winnerId) {
       if (input.type === 'swapPass') {
         // V43 swap-pass already advances the turn.
@@ -130,7 +141,7 @@ export function createTurnController({
     await persist();
     if (session.state.winnerId) {
       busy = false;
-      emit('winner', { winnerId: session.state.winnerId });
+      await emit('winner', { winnerId: session.state.winnerId });
       return result;
     }
 
