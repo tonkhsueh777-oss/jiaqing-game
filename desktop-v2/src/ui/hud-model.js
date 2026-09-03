@@ -44,6 +44,7 @@ function selectedGuide(action, selected, game, state, active, canSwapPass) {
 }
 
 export function buildHudModel(state, game, selectedRuntimeId = null) {
+  const treasureNames = Object.fromEntries(TREASURE_ORDER.map(id => [id, game.TREASURES?.[id]?.shortName || id]));
   const players = (state?.players || []).map((player, index) => ({
     id: player.id,
     name: player.id === 'human' ? '我（你）' : player.name,
@@ -86,7 +87,8 @@ export function buildHudModel(state, game, selectedRuntimeId = null) {
       activePlayerId: active?.id || null
     },
     players,
-    treasures: TREASURE_ORDER.map(id => ({ id, name: game.TREASURES?.[id]?.shortName || id, count: Number(human?.treasures?.[id] || 0) })),
+    treasureNames,
+    treasures: TREASURE_ORDER.map(id => ({ id, name: treasureNames[id], count: Number(human?.treasures?.[id] || 0) })),
     deck: { drawCount: state?.drawPile?.length || 0, discardCount: state?.discardPile?.length || 0 },
     log: (state?.log || []).slice(-7),
     hand,
