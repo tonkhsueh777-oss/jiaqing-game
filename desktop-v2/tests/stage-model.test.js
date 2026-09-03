@@ -39,6 +39,17 @@ test('stage model exposes unopened locations until their V43地牌 is played', (
   assert.equal(model.locations.find(item => item.id === 'zhuluo').opened, false);
 });
 
+test('V2 locations expose miniature-stage depth and reveal parameters', () => {
+  const state = { currentPlayerIndex: 0, openedLocations: { tainan: true }, players: [] };
+  const model = buildStageModel(state);
+  for (const location of model.locations) {
+    assert.equal(location.stage.pedestalDepth > 0, true);
+    assert.equal(location.stage.revealLift > 0, true);
+    assert.equal(Math.abs(location.stage.tilt) > 0, true);
+    assert.equal(location.stage.sceneScale > 1, true);
+  }
+});
+
 test('stage model exposes physical draw and discard stacks with current counts', () => {
   const state = {
     currentPlayerIndex: 0,
