@@ -1,6 +1,8 @@
 import './ui/app-shell.css';
 import './ui/hud.css';
 import './presentation/presentation.css';
+import { createAudioDirector } from './audio/audio-director.js';
+import { cueForPresentation, cueForTurnEvent } from './audio/audio-cues.js';
 import { loadV43Core } from './core/v43-bootstrap.js';
 import { createGameAdapter } from './core/game-adapter.js';
 import { createTurnController } from './gameplay/turn-controller.js';
@@ -34,7 +36,18 @@ async function boot() {
 
   const stageHost = root.querySelector('#v2-stage-canvas-host');
   const stage = await mountStage(stageHost, session, { quality: qualityFromRoot(root) });
-  const director = createPresentationDirector({ root, stage });
+  const audio = createAudioDirector();
+  const director = createPresentationDirector({
+    root,
+    stage,
+    audio: {
+      playPresentation(effect) {
+        return audio.play(cueForPresentation(effect));
+      }
+    }
+  });
+
+  root.addEventListener('pointerdown', () => { void audio.unlock(); }, { once: true });
 
   function refresh() {
     hud = renderHud(root, game, session, selectedRuntimeId, interaction);
@@ -47,6 +60,8 @@ async function boot() {
     aiDelayMs: qualityFromRoot(root) === 'low' ? 360 : 520,
     async onChange(event) {
       root.dataset.activity = event.type;
+      const turnCue = cueForTurnEvent(event);
+      if (turnCue) void audio.play(turnCue);
       const sequence = buildPresentationSequence(event);
       if (sequence.length) await director.play(sequence, event);
       refresh();
@@ -83,66 +98,72 @@ async function boot() {
     }
 
     const actionButton = event.target.closest?.('[data-pending-action]');
-    if (!actionButton || controller.busy) return;
-    const pending = actionButton.dataset.pendingAction;
+    if (actionButton && !controller.busy) {
+      const pending = actionButton.dataset.pendingAction;
 
-    if (pending === 'special-reset') {
-      interaction = {};
-      refresh();
-      return;
+      if (pending === 'special-reset') {
+        interaction = {};
+        refresh();
+        return;
+      }
+      if (pending === 'tactic-target') {
+        interaction = { tacticTargetId: actionButton.dataset.target };
+        refresh();
+        return;
+      }
+      if (pending === 'tactic-confirm') {
+        await executeSelected({ type: 'tactic', targetPlayerId: interaction.tacticTargetId });
+        return;
+      }
+      if (pending === 'trump-target') {
+        interaction = { trump: { targetPlayerId: actionButton.dataset.target } };
+        refresh();
+        return;
+      }
+      if (pending === 'trump-own') {
+        interaction = { trump: { ...(interaction.trump || {}), ownTreasureId: actionButton.dataset.treasureId } };
+        refresh();
+        return;
+      }
+      if (pending === 'trump-target-treasure') {
+        interaction = { trump: { ...(interaction.trump || {}), targetTreasureId: actionButton.dataset.treasureId } };
+        refresh();
+        return;
+      }
+      if (pending === 'trump-confirm') {
+        const flow = interaction.trump || {};
+        await executeSelected({
+          type: 'trump',
+          targetPlayerId: flow.targetPlayerId,
+          ownTreasureId: flow.ownTreasureId,
+          targetTreasureId: flow.targetTreasureId
+        });
+        return;
+      }
+      if (pending === 'travel') {
+        await executeSelected({ type: 'travel', destination: actionButton.dataset.target });
+        return;
+      }
+      if (pending === 'swap-pass') {
+        await executeSelected({ type: 'swapPass' });
+        return;
+      }
+      if (pending === 'location' || pending === 'inspect' || pending === 'discard') {
+        await executeSelected({ type: pending });
+        return;
+      }
     }
 
-    if (pending === 'tactic-target') {
-      interaction = { tacticTargetId: actionButton.dataset.target };
-      refresh();
+    const appAction = event.target.closest?.('[data-action]');
+    if (!appAction) return;
+    if (appAction.dataset.action === 'toggle-fullscreen') {
+      platform.window.toggleFullscreen();
       return;
     }
-    if (pending === 'tactic-confirm') {
-      await executeSelected({ type: 'tactic', targetPlayerId: interaction.tacticTargetId });
-      return;
+    if (appAction.dataset.action === 'toggle-sound') {
+      audio.setEnabled(!audio.enabled);
+      appAction.textContent = `音效：${audio.enabled ? '开' : '关'}`;
     }
-
-    if (pending === 'trump-target') {
-      interaction = { trump: { targetPlayerId: actionButton.dataset.target } };
-      refresh();
-      return;
-    }
-    if (pending === 'trump-own') {
-      interaction = { trump: { ...(interaction.trump || {}), ownTreasureId: actionButton.dataset.treasureId } };
-      refresh();
-      return;
-    }
-    if (pending === 'trump-target-treasure') {
-      interaction = { trump: { ...(interaction.trump || {}), targetTreasureId: actionButton.dataset.treasureId } };
-      refresh();
-      return;
-    }
-    if (pending === 'trump-confirm') {
-      const flow = interaction.trump || {};
-      await executeSelected({
-        type: 'trump',
-        targetPlayerId: flow.targetPlayerId,
-        ownTreasureId: flow.ownTreasureId,
-        targetTreasureId: flow.targetTreasureId
-      });
-      return;
-    }
-
-    if (pending === 'travel') {
-      await executeSelected({ type: 'travel', destination: actionButton.dataset.target });
-      return;
-    }
-    if (pending === 'swap-pass') {
-      await executeSelected({ type: 'swapPass' });
-      return;
-    }
-    if (pending === 'location' || pending === 'inspect' || pending === 'discard') {
-      await executeSelected({ type: pending });
-    }
-  });
-
-  root.querySelector('[data-action="toggle-fullscreen"]')?.addEventListener('click', () => {
-    platform.window.toggleFullscreen();
   });
 
   root.querySelectorAll('[data-quality]').forEach(button => {
