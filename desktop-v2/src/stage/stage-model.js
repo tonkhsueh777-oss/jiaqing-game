@@ -17,15 +17,22 @@ const QUALITY = Object.freeze({
   low: Object.freeze({ id: 'low', particles: false, shadows: false, motionScale: 0.55, glow: 0.55 })
 });
 
+const TREASURE_IDS = Object.freeze(['goldSeal', 'sword', 'gun', 'pomelo']);
+
 function resolveSlot(position) {
   if (!position || position === 'center') return STAGE_LAYOUT.center;
   return STAGE_LAYOUT.locations[position] || STAGE_LAYOUT.center;
+}
+
+function normalizeTreasures(treasures = {}) {
+  return Object.fromEntries(TREASURE_IDS.map(id => [id, Math.max(0, Number(treasures[id]) || 0)]));
 }
 
 export function buildStageModel(state, options = {}) {
   const quality = QUALITY[options.quality] || QUALITY.standard;
   const players = (state?.players || []).map((player, index) => {
     const slot = resolveSlot(player.position);
+    const treasures = normalizeTreasures(player.treasures);
     return {
       id: player.id,
       name: player.name,
@@ -34,7 +41,9 @@ export function buildStageModel(state, options = {}) {
       x: slot.x,
       y: slot.y,
       active: index === state.currentPlayerIndex,
-      kind: player.kind || (player.id === 'human' ? 'human' : 'ai')
+      kind: player.kind || (player.id === 'human' ? 'human' : 'ai'),
+      treasures,
+      treasureKinds: TREASURE_IDS.filter(id => treasures[id] > 0).length
     };
   });
 
