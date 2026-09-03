@@ -20,7 +20,20 @@ function revealForAi(event, action, card) {
 }
 
 export function buildPresentationSequence(event) {
-  if (!event || !event.result?.ok) return [];
+  if (!event) return [];
+
+  if (event.type === 'winner') {
+    const winnerId = event.winnerId || event.state?.winnerId;
+    const winner = playerById(event.state, winnerId);
+    if (!winnerId) return [];
+    return [{
+      kind: winnerId === 'human' ? 'victory' : 'defeat',
+      winnerId,
+      winnerName: winner?.name || (winnerId === 'human' ? '玩家（你）' : 'AI玩家')
+    }];
+  }
+
+  if (!event.result?.ok) return [];
   if (event.type !== 'human-action' && event.type !== 'ai-action') return [];
 
   const action = event.action || event.decision || {};
@@ -83,11 +96,15 @@ export function buildPresentationSequence(event) {
         cardName
       });
     } else if (event.result.effect === 'burnHand') {
+      const burned = event.result.burnedCard || {};
       sequence.push({
         kind: 'burn',
         playerId: event.playerId,
         targetPlayerId,
-        burnedCardName: event.result.burnedCard?.name || '未知手牌',
+        burnedCardName: burned.name || '未知手牌',
+        burnedCardKey: burned.key || '',
+        burnedCardType: burned.type || '',
+        burnedLocationId: burned.locationId || '',
         cardName
       });
     } else if (event.result.effect === 'skipTurn') {
