@@ -56,7 +56,15 @@ button { font: inherit; }
 .v2-stage::after { content:""; pointer-events:none; position:absolute; z-index:3; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.18),transparent 18%,transparent 80%,rgba(0,0,0,.23)); }
 .v2-stage-canvas-host { position:absolute; z-index:2; inset:0; }
 .v2-stage-canvas { width:100%; height:100%; display:block; }
-.v2-stage-topline { position:absolute; z-index:4; left:18px; right:18px; top:14px; display:flex; justify-content:center; align-items:flex-start; pointer-events:none; }
+.v2-stage-guidance { position:absolute; z-index:4; inset:0; pointer-events:none; }
+.v2-stage-marker { position:absolute; width:88px; height:88px; transform:translate(-50%,-50%); display:grid; place-items:center; }
+.v2-stage-marker i { position:absolute; inset:9px; border:2px solid rgba(247,204,92,.92); border-radius:50%; background:radial-gradient(circle,rgba(245,194,67,.12),rgba(245,194,67,.025) 55%,transparent 72%); box-shadow:0 0 0 7px rgba(221,169,48,.07),0 0 28px rgba(240,188,57,.26); animation:v2GuidePulse 1.45s ease-in-out infinite; }
+.v2-stage-marker b { position:absolute; top:-2px; left:50%; transform:translateX(-50%); white-space:nowrap; padding:4px 8px; border:1px solid rgba(239,198,98,.68); border-radius:8px; color:#fff0b5; background:rgba(20,29,24,.92); box-shadow:0 5px 14px rgba(0,0,0,.30); font-size:9px; letter-spacing:.05em; }
+.v2-stage-marker--player i { border-color:rgba(255,229,145,.96); box-shadow:0 0 0 7px rgba(255,220,116,.08),0 0 32px rgba(255,206,89,.32); }
+.v2-stage-marker--player.is-selected i { border-width:3px; background:radial-gradient(circle,rgba(255,210,82,.22),rgba(255,210,82,.04) 60%,transparent 74%); }
+.v2-stage-guidance[data-mode="tactic"] .v2-stage-marker i { border-color:rgba(217,117,83,.96); box-shadow:0 0 0 7px rgba(174,73,50,.09),0 0 30px rgba(220,94,59,.30); }
+.v2-stage-guidance[data-mode="trump"] .v2-stage-marker i { border-color:rgba(255,221,116,.98); box-shadow:0 0 0 8px rgba(220,172,54,.10),0 0 34px rgba(244,194,62,.34); }
+.v2-stage-topline { position:absolute; z-index:5; left:18px; right:18px; top:14px; display:flex; justify-content:center; align-items:flex-start; pointer-events:none; }
 .v2-turn-banner { pointer-events:none; min-width:180px; padding:8px 24px 9px; text-align:center; border:1px solid rgba(236,190,87,.72); border-radius:14px; color:#ffe9a7; background:linear-gradient(180deg,rgba(36,31,21,.92),rgba(12,23,22,.92)); box-shadow:0 7px 22px rgba(0,0,0,.34),0 0 26px rgba(225,170,54,.12); }
 .v2-turn-banner small { display:block; color:#c4a45c; font-size:9px; letter-spacing:.18em; margin-bottom:2px; }
 .v2-turn-banner strong { font-size:15px; letter-spacing:.06em; }
@@ -76,8 +84,13 @@ button { font: inherit; }
   0%,100% { opacity:.38; transform:scale(.982); filter:blur(7px); }
   50% { opacity:.66; transform:scale(1.018); filter:blur(10px); }
 }
+@keyframes v2GuidePulse {
+  0%,100% { transform:scale(.88); opacity:.62; }
+  50% { transform:scale(1.08); opacity:1; }
+}
 [data-quality="low"] .v2-stage::before { animation:none; opacity:.16; filter:none; transform:none; }
 [data-quality="low"] .v2-stage::after { background:linear-gradient(180deg,rgba(0,0,0,.12),transparent 18%,transparent 84%,rgba(0,0,0,.18)); }
+[data-quality="low"] .v2-stage-marker i { animation:none; box-shadow:0 0 0 4px rgba(221,169,48,.06); }
 @media (max-width: 1280px) {
   .v2-shell { grid-template-columns: 210px minmax(0,1fr) 240px; gap: 8px; padding: 8px; }
   .v2-left, .v2-right { padding: 10px; }
