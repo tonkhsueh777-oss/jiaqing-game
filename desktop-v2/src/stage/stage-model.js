@@ -1,10 +1,17 @@
+const MINI_STAGE = Object.freeze({
+  north: Object.freeze({ pedestalDepth: 18, revealLift: 48, tilt: -0.035, sceneScale: 1.10 }),
+  west: Object.freeze({ pedestalDepth: 16, revealLift: 42, tilt: 0.028, sceneScale: 1.08 }),
+  east: Object.freeze({ pedestalDepth: 16, revealLift: 42, tilt: -0.028, sceneScale: 1.08 }),
+  south: Object.freeze({ pedestalDepth: 20, revealLift: 50, tilt: 0.035, sceneScale: 1.12 })
+});
+
 export const STAGE_LAYOUT = Object.freeze({
   center: Object.freeze({ id: 'center', slot: 'center', x: 0.5, y: 0.50 }),
   locations: Object.freeze({
-    tainan: Object.freeze({ id: 'tainan', name: '台南府城', slot: 'north', x: 0.5, y: 0.17, treasure: '金印' }),
-    madou: Object.freeze({ id: 'madou', name: '麻豆古镇', slot: 'west', x: 0.22, y: 0.50, treasure: '柚子' }),
-    mengxia: Object.freeze({ id: 'mengxia', name: '艋舺', slot: 'east', x: 0.78, y: 0.50, treasure: '火枪' }),
-    zhuluo: Object.freeze({ id: 'zhuluo', name: '诸罗大营', slot: 'south', x: 0.5, y: 0.82, treasure: '宝剑' })
+    tainan: Object.freeze({ id: 'tainan', name: '台南府城', slot: 'north', x: 0.5, y: 0.17, treasure: '金印', stage: MINI_STAGE.north }),
+    madou: Object.freeze({ id: 'madou', name: '麻豆古镇', slot: 'west', x: 0.22, y: 0.50, treasure: '柚子', stage: MINI_STAGE.west }),
+    mengxia: Object.freeze({ id: 'mengxia', name: '艋舺', slot: 'east', x: 0.78, y: 0.50, treasure: '火枪', stage: MINI_STAGE.east }),
+    zhuluo: Object.freeze({ id: 'zhuluo', name: '诸罗大营', slot: 'south', x: 0.5, y: 0.82, treasure: '宝剑', stage: MINI_STAGE.south })
   }),
   deck: Object.freeze({
     draw: Object.freeze({ id: 'draw', x: 0.12, y: 0.77 }),
@@ -49,6 +56,7 @@ export function buildStageModel(state, options = {}) {
 
   const locations = Object.values(STAGE_LAYOUT.locations).map(location => ({
     ...location,
+    stage: { ...location.stage },
     opened: Boolean(state?.openedLocations?.[location.id])
   }));
 
