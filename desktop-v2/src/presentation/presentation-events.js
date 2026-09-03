@@ -155,9 +155,17 @@ export function buildPresentationSequence(event) {
   }
 
   if (action.type === 'discard' || action.type === 'pass' || action.type === 'swapPass') {
-    sequence.push({ kind: 'discard', playerId: event.playerId, cardName });
+    const discarded = card || event.result?.discarded || {};
+    sequence.push({
+      kind: 'discard',
+      playerId: event.playerId,
+      cardName,
+      cardKey: discarded.key || '',
+      cardType: discarded.type || '',
+      locationId: discarded.locationId || ''
+    });
     if (event.playerId === 'human' && event.result?.cards?.length) {
-      sequence.push(...event.result.cards.map(card => drawCardEffect('human', card)));
+      sequence.push(...event.result.cards.map(nextCard => drawCardEffect('human', nextCard)));
     }
   }
 
