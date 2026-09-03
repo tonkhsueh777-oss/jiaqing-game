@@ -76,6 +76,28 @@ async function showCardReveal(root, overlay, effect) {
   clearOverlay(overlay);
 }
 
+async function showDraw(root, overlay, effect) {
+  if (!overlay) return;
+  const hidden = effect.kind === 'draw-hidden';
+  const src = hidden ? '' : resolveCardAsset(cardLike(effect));
+  const owner = effect.playerId === 'human' ? '补入你的手牌' : `${effect.playerId === 'ai1' ? 'AI 玩家一' : 'AI 玩家二'}补牌`;
+  overlay.className = `v2-presentation-overlay is-active is-draw ${hidden ? 'is-draw-hidden' : 'is-draw-visible'}`;
+  overlay.innerHTML = `
+    <div class="v2-draw-content">
+      <small>${owner}</small>
+      <div class="v2-draw-card-wrap">
+        ${hidden
+          ? `<div class="v2-draw-card-back"><span>御</span></div>`
+          : `<img class="v2-draw-card" src="${src}" alt="${effect.cardName}">`}
+      </div>
+      <strong>${hidden ? `补牌 ×${effect.count || 1}` : effect.cardName}</strong>
+    </div>`;
+  await sleep(qualityDuration(root, 520, 250));
+  overlay.classList.add('is-leaving');
+  await sleep(qualityDuration(root, 130, 60));
+  clearOverlay(overlay);
+}
+
 function detailFor(effect) {
   if (effect.kind === 'burn') return `被烧掉：${effect.burnedCardName || '1张手牌'}`;
   if (effect.kind === 'swap') return '双方棋子沿交叉轨迹完成换位';
@@ -151,6 +173,10 @@ export function createPresentationDirector({ root, stage, audio = null }) {
       if (audio?.playPresentation) void audio.playPresentation(effect);
       if (effect.kind === 'card-reveal') {
         await showCardReveal(root, overlay, effect);
+        continue;
+      }
+      if (effect.kind === 'draw-card' || effect.kind === 'draw-hidden') {
+        await showDraw(root, overlay, effect);
         continue;
       }
       if (effect.kind === 'victory' || effect.kind === 'defeat') {
