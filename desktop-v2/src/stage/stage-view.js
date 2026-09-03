@@ -66,7 +66,7 @@ function drawRoutes(layer, width, height, locations, activePlayerId) {
   layer.addChild(routes);
 }
 
-async function drawLocation(layer, width, height, location, texture) {
+function drawLocation(layer, width, height, location, texture) {
   const x = width * location.x;
   const y = height * location.y;
   const landscape = location.slot === 'east' || location.slot === 'west';
@@ -83,29 +83,52 @@ async function drawLocation(layer, width, height, location, texture) {
 
   const frame = new Graphics();
   frame.roundRect(-cardW / 2, -cardH / 2, cardW, cardH, 18)
-    .fill({ color: 0x1b241d, alpha: 0.96 })
-    .stroke({ color: 0xd4a64c, width: 3, alpha: 0.8 });
+    .fill({ color: location.opened ? 0x1b241d : 0x0c2426, alpha: 0.96 })
+    .stroke({ color: location.opened ? 0xd4a64c : 0x8b7440, width: 3, alpha: location.opened ? 0.8 : 0.62 });
   holder.addChild(frame);
 
-  const sprite = new Sprite(texture);
-  sprite.anchor.set(0.5);
   const targetW = cardW - 14;
   const targetH = cardH - 40;
-  const scale = Math.max(targetW / sprite.texture.width, targetH / sprite.texture.height);
-  sprite.scale.set(scale);
-  const mask = new Graphics();
-  mask.roundRect(-targetW / 2, -targetH / 2 - 12, targetW, targetH, 12).fill(0xffffff);
-  holder.addChild(mask);
-  sprite.mask = mask;
-  sprite.y = -12;
-  holder.addChild(sprite);
+
+  if (location.opened) {
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    const scale = Math.max(targetW / sprite.texture.width, targetH / sprite.texture.height);
+    sprite.scale.set(scale);
+    const mask = new Graphics();
+    mask.roundRect(-targetW / 2, -targetH / 2 - 12, targetW, targetH, 12).fill(0xffffff);
+    holder.addChild(mask);
+    sprite.mask = mask;
+    sprite.y = -12;
+    holder.addChild(sprite);
+  } else {
+    const back = new Graphics();
+    back.roundRect(-targetW / 2, -targetH / 2 - 12, targetW, targetH, 12)
+      .fill({ color: 0x092c2e, alpha: 0.98 })
+      .stroke({ color: 0x927a40, width: 1.5, alpha: 0.55 });
+    back.roundRect(-targetW * 0.42, -targetH * 0.37 - 12, targetW * 0.84, targetH * 0.74, 9)
+      .stroke({ color: 0xb0954e, width: 1, alpha: 0.28 });
+    back.circle(0, -12, Math.min(targetW, targetH) * 0.22)
+      .fill({ color: 0x715620, alpha: 0.18 })
+      .stroke({ color: 0xd0ac55, width: 2, alpha: 0.32 });
+    holder.addChild(back);
+
+    const seal = makeText('御', Math.max(25, cardW * 0.15), '#c9aa5a', '900');
+    seal.anchor.set(0.5);
+    seal.y = -14;
+    holder.addChild(seal);
+    const waiting = makeText('待揭示', Math.max(10, cardW * 0.055), '#8f9c94', '800');
+    waiting.anchor.set(0.5);
+    waiting.y = targetH * 0.28;
+    holder.addChild(waiting);
+  }
 
   const labelPlate = new Graphics();
   labelPlate.roundRect(-cardW * 0.36, cardH * 0.26, cardW * 0.72, 34, 9)
-    .fill({ color: 0xd4b16b, alpha: 0.96 })
+    .fill({ color: location.opened ? 0xd4b16b : 0x594b2b, alpha: 0.96 })
     .stroke({ color: 0x5b3916, width: 2, alpha: 0.9 });
   holder.addChild(labelPlate);
-  const label = makeText(location.name, Math.max(13, cardW * 0.075), '#24160b', '800');
+  const label = makeText(location.opened ? location.name : '封存地牌', Math.max(13, cardW * 0.075), location.opened ? '#24160b' : '#d5c695', '800');
   label.anchor.set(0.5);
   label.y = cardH * 0.26 + 17;
   holder.addChild(label);
@@ -281,6 +304,14 @@ export async function mountStage(host, session, options = {}) {
       return;
     }
 
+    if (effect.kind === 'location-open') {
+      const { width, height } = renderState(beforeState, { quality });
+      const point = stagePoint(effect.locationId || 'center', width, height);
+      await pulseEffect(app, point, effect, quality);
+      renderState(afterState, { quality });
+      return;
+    }
+
     const { width, height } = renderState(afterState, { quality });
     if (effect.kind === 'burn' || effect.kind === 'lock') {
       const target = playerById(afterState, effect.targetPlayerId);
@@ -290,7 +321,7 @@ export async function mountStage(host, session, options = {}) {
       return;
     }
 
-    if (effect.kind === 'treasure' || effect.kind === 'location-open') {
+    if (effect.kind === 'treasure') {
       const point = stagePoint(effect.locationId || 'center', width, height);
       await pulseEffect(app, point, effect, quality);
       renderState(afterState, { quality });
