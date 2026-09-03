@@ -12,7 +12,10 @@
     "desktop:dev": "tauri dev",
     "desktop:build:mac": "tauri build --target universal-apple-darwin --bundles app,dmg",
     "verify:v43-boundary": "node scripts/verify-v43-boundary.mjs",
-    "verify": "npm test && npm run build && npm run verify:v43-boundary"
+    "verify": "npm test && npm run build && npm run verify:v43-boundary",
+    "icons": "tauri icon app-icon.svg",
+    "predesktop:dev": "npm run icons",
+    "predesktop:build:mac": "npm run icons"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0"
