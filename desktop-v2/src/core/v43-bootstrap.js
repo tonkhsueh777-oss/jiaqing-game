@@ -6,6 +6,7 @@ export async function loadV43Core() {
   globalThis.JQGame = {};
   await import('../../../src/namespace.js');
   await import('../../../src/catalog.js');
+  await import('../../../src/v43-special-card-guide-logic.js');
   await import('../../../src/state.js');
   await import('../../../src/rules.js');
   await import('../../../src/ai.js');

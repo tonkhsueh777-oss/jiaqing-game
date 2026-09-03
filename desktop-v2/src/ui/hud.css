@@ -1,0 +1,33 @@
+.v2-player-row { display:flex; align-items:center; gap:9px; padding:8px 7px; margin-top:6px; border:1px solid transparent; border-radius:10px; background:rgba(8,34,36,.46); }
+.v2-player-row.is-active { border-color:rgba(239,194,91,.65); background:linear-gradient(90deg,rgba(116,84,26,.28),rgba(8,34,36,.48)); box-shadow:0 0 18px rgba(214,161,49,.10); }
+.v2-player-dot { width:30px; height:30px; flex:0 0 30px; display:grid; place-items:center; border-radius:50%; border:2px solid rgba(237,203,118,.58); color:#fff1c2; background:#183b3b; font-weight:900; font-size:12px; }
+.v2-player-row strong { display:block; color:#f8e6b4; font-size:12px; }
+.v2-player-row small { display:block; margin-top:2px; color:#91aaa4; font-size:9px; line-height:1.35; }
+#v2-treasure-list { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.v2-treasure { min-height:42px; display:flex; justify-content:space-between; align-items:center; padding:7px 8px; border-radius:9px; border:1px solid rgba(210,174,92,.16); background:rgba(8,34,36,.5); }
+.v2-treasure span { color:#b9c5be; font-size:10px; }
+.v2-treasure strong { color:#f2cf76; font-size:13px; }
+.v2-deck-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.v2-deck-grid > div { padding:8px; text-align:center; border-radius:9px; border:1px solid rgba(210,174,92,.15); background:rgba(8,34,36,.48); }
+.v2-deck-grid span { display:block; color:#93aaa5; font-size:9px; }
+.v2-deck-grid strong { display:block; margin-top:3px; color:#f6d57e; font-size:18px; }
+#v2-action-log { display:grid; gap:4px; color:#9eb4ae; font-size:9px; line-height:1.4; }
+.v2-hand__cards { perspective:1000px; }
+.v2-hand-card { position:relative; width:min(112px,10vw); aspect-ratio:.68; margin:0 -4px; padding:0; border:0; border-radius:10px; background:#07181b; transform:rotate(var(--fan)) translateY(3px); transform-origin:50% 120%; cursor:pointer; transition:transform .16s ease, filter .16s ease, opacity .16s ease; box-shadow:0 12px 24px rgba(0,0,0,.32); overflow:hidden; }
+.v2-hand-card img { width:100%; height:100%; display:block; object-fit:cover; }
+.v2-hand-card > span { position:absolute; left:7px; right:7px; bottom:6px; padding:4px 5px; border-radius:6px; color:#fff4d5; background:rgba(5,18,19,.82); font-size:9px; font-weight:800; text-align:center; backdrop-filter:blur(3px); }
+.v2-hand-card:hover { transform:rotate(var(--fan)) translateY(-12px) scale(1.035); filter:brightness(1.08); z-index:3; }
+.v2-hand-card.is-selected { transform:rotate(var(--fan)) translateY(-18px) scale(1.055); outline:2px solid rgba(246,196,74,.95); box-shadow:0 0 0 4px rgba(221,159,40,.13),0 18px 30px rgba(0,0,0,.38),0 0 28px rgba(230,167,46,.22); z-index:4; }
+.v2-hand-card.is-disabled:not(.is-selected) { opacity:.55; filter:saturate(.65) brightness(.74); }
+.v2-preview-empty { height:170px; display:grid; place-items:center; color:#7f9792; border:1px dashed rgba(210,174,92,.18); border-radius:10px; font-size:11px; }
+.v2-preview-card { text-align:center; }
+.v2-preview-card img { width:min(128px,72%); max-height:185px; object-fit:cover; border-radius:9px; border:1px solid rgba(230,192,99,.45); box-shadow:0 10px 24px rgba(0,0,0,.3); }
+.v2-preview-card strong { display:block; margin-top:8px; color:#ffe4a0; font-size:13px; }
+.v2-preview-card small { display:block; margin-top:2px; color:#bf9f57; font-size:9px; }
+.v2-preview-card p { margin:7px 0 0; color:#a9bbb5; font-size:9px; line-height:1.45; text-align:left; }
+#v2-action-guide { color:#c2cdc8; font-size:11px; line-height:1.6; }
+.v2-action-button { min-height:39px; border:1px solid rgba(226,188,96,.36); border-radius:9px; color:#ffe9ad; background:linear-gradient(180deg,#234f53,#15373a); cursor:pointer; font-size:11px; font-weight:800; }
+.v2-action-button:hover:not(:disabled) { filter:brightness(1.1); border-color:rgba(240,199,98,.7); }
+.v2-action-button:disabled { cursor:default; color:#708681; background:#10282b; opacity:.65; }
+@media (max-width:1280px) { .v2-hand-card { width:min(98px,9.5vw); } .v2-player-row { padding:6px; } }
+@media (max-height:800px) { .v2-hand-card { width:min(92px,9vw); } .v2-preview-card img { max-height:135px; } }

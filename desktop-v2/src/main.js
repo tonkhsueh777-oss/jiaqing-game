@@ -1,9 +1,11 @@
 import './ui/app-shell.css';
+import './ui/hud.css';
 import { loadV43Core } from './core/v43-bootstrap.js';
 import { createGameAdapter } from './core/game-adapter.js';
 import { createPlatformApi } from './platform/platform-api.js';
 import { createDesktopSession } from './state/desktop-session.js';
 import { renderAppShell } from './ui/app-shell.js';
+import { renderHud } from './ui/hud-view.js';
 import { mountStage } from './stage/stage-view.js';
 
 function qualityFromRoot(root) {
@@ -20,9 +22,25 @@ async function boot() {
 
   root.dataset.quality = 'standard';
   renderAppShell(root, session);
+  let selectedRuntimeId = null;
+  let hud = renderHud(root, game, session, selectedRuntimeId);
 
   const stageHost = root.querySelector('#v2-stage-canvas-host');
   const stage = await mountStage(stageHost, session, { quality: qualityFromRoot(root) });
+
+  function refresh() {
+    hud = renderHud(root, game, session, selectedRuntimeId);
+    stage.render(session.state, { quality: qualityFromRoot(root) });
+  }
+
+  root.addEventListener('click', event => {
+    const cardButton = event.target.closest?.('[data-card-id]');
+    if (cardButton) {
+      selectedRuntimeId = selectedRuntimeId === cardButton.dataset.cardId ? null : cardButton.dataset.cardId;
+      refresh();
+      return;
+    }
+  });
 
   root.querySelector('[data-action="toggle-fullscreen"]')?.addEventListener('click', () => {
     platform.window.toggleFullscreen();
@@ -38,6 +56,7 @@ async function boot() {
   });
 
   window.addEventListener('resize', () => stage.render(session.state, { quality: qualityFromRoot(root) }));
+  void hud;
 }
 
 boot().catch(error => {
