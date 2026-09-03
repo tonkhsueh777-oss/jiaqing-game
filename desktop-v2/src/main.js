@@ -1,3 +1,4 @@
+import './compat/old-webkit.js';
 import './ui/app-shell.css';
 import './ui/hud.css';
 import './presentation/presentation.css';
