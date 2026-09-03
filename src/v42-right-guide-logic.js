@@ -6,7 +6,7 @@
     root.JQGame.V42RightGuideLogic = api;
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-  function guideFor({ humanTurn = false, mode = 'idle', playableNames = [] } = {}) {
+  function guideFor({ humanTurn = false, mode = 'idle', playableNames = [], special = null, hint = '' } = {}) {
     if (!humanTurn) return null;
 
     if (mode === 'choosePassCard') {
@@ -15,6 +15,24 @@
         title: '正在选择弃牌',
         detail: '请选择1张你不想保留的手牌。',
         next: '弃掉后，系统会自动补1张新牌并结束本回合。'
+      };
+    }
+
+    if (mode === 'specialUnavailable' && special) {
+      return {
+        kind: 'special',
+        title: `${special.name}｜${special.typeLabel}`,
+        detail: hint || `${special.name}现在暂时不能使用。`,
+        next: '你可以选择其他可用手牌，或换1张并结束本回合。'
+      };
+    }
+
+    if (['chooseTacticTarget', 'chooseTrumpOpponent', 'chooseTrumpOwnTreasure', 'chooseTrumpTargetTreasure'].includes(mode) && special) {
+      return {
+        kind: 'special',
+        title: `${special.name}｜${special.typeLabel}`,
+        detail: special.detail,
+        next: hint || special.targetPrompt
       };
     }
 
