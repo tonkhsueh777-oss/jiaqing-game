@@ -10,6 +10,7 @@
       position: 'center',
       treasures: { goldSeal: 0, sword: 0, gun: 0, pomelo: 0 },
       skipTurns: 0,
+      skipSource: '',
       lastAction: ''
     };
   }
