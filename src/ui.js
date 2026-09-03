@@ -42,8 +42,14 @@
     if (!card) return '';
     if (card.type === 'travel') return '线上规则：打出1张巡游，沿地图连线移动1格；未开放地点不能进入；本回合只能执行这1个动作。';
     if (card.type === 'inspect') return '线上规则：停留在已开放地点时打出，立即取得该地点对应圣物1件；库存为0时仍会消耗此牌。';
-    if (card.type === 'tactic') return '线上规则：指定1名对手，使其下一个完整回合直接跳过；效果可累计。';
-    if (card.type === 'trump') return '线上规则：用自己1件圣物，强制交换任意对手的1件圣物。';
+    if (card.type === 'tactic') {
+      const summary = game.SpecialCardGuideLogic?.detailFor?.(card);
+      return summary ? `计策牌：${summary}` : '计策牌：点击后按右侧行动说明选择目标。';
+    }
+    if (card.type === 'trump') {
+      const summary = game.SpecialCardGuideLogic?.detailFor?.(card);
+      return summary ? `王牌：${summary}` : '王牌：用自己1件宝物，强制交换任意对手的1件宝物。';
+    }
     if (card.type === 'location') {
       const name = game.LOCATIONS[card.locationId]?.name || card.name || '地点';
       return `线上规则：首次打出【${name}】后永久留在中央棋盘并开放地点；重复地牌可直接弃置，本回合随即结束。`;
@@ -188,8 +194,10 @@
     const cardButtons = human.hand.map((card, index) => {
       const selected = interaction.selectedRuntimeId === card.runtimeId;
       const disabled = !isHumanTurn || state.phase !== 'action';
-      return `<button class="hand-card-button ${selected ? 'is-selected' : ''} ${index === human.hand.length - 1 ? 'card-enter-hand' : ''}" type="button" data-card-id="${card.runtimeId}" ${disabled ? 'disabled' : ''} aria-label="${escapeHtml(card.name)}">
+      const specialSummary = game.SpecialCardGuideLogic?.summaryFor?.(card) || '';
+      return `<button class="hand-card-button ${selected ? 'is-selected' : ''} ${specialSummary ? 'is-special-card' : ''} ${index === human.hand.length - 1 ? 'card-enter-hand' : ''}" type="button" data-card-id="${card.runtimeId}" ${disabled ? 'disabled' : ''} aria-label="${escapeHtml(card.name)}">
         <img src="${card.asset}" alt="${escapeHtml(card.name)}">
+        ${specialSummary ? `<span class="special-card-summary">${escapeHtml(specialSummary)}</span>` : ''}
         <span class="card-tooltip">${escapeHtml(cardRuleText(card))}</span>
       </button>`;
     }).join('');
@@ -324,7 +332,7 @@
   function showRules() {
     showChoiceDialog({
       title: '线上版核心规则',
-      message: '每名玩家手牌维持3张。每回合只能执行1个动作：打出地牌开放地点、打出巡游沿连线移动1格、打出明察取得当前地点圣物、使用计策让对手跳过回合，或使用王牌交换圣物。动作结算后会自动补牌并结束回合；若本回合没有合适动作，可选择1张手牌换牌后结束。率先集齐金印、宝剑、火枪、柚子四种不同圣物者获胜。',
+      message: '每名玩家手牌维持3张。每回合只能执行1个动作：地牌开放地点、巡游移动1格、明察取得圣物。三张计策效果不同：恶霸王豹让对手跳过下回合；火烧百顺楼随机烧掉对手1张手牌；假绿菊花与对手交换当前位置。嘉庆令与王德禄令属于王牌，可用自己1件宝物强制交换对手1件宝物。特殊牌点击后请跟随右侧行动说明，发动前都会再次确认。动作结算后自动补牌并结束回合；率先集齐四种不同圣物者获胜。',
       choices: [],
       cancelText: '知道了'
     });
