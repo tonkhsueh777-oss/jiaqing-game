@@ -4,6 +4,9 @@ export function createGameAdapter(game) {
   return Object.freeze({
     createState: options => game.createGameState(options),
     beginTurn: (state, rng) => game.beginTurn(state, rng),
+    completeTurn: (state, rng) => game.completeSingleActionTurn(state, rng),
+    finishDiscard: state => game.finishDiscardPhase(state),
+    mustDiscard: (state, playerId) => game.mustDiscard(state, playerId),
     legalActions: (state, playerId) => game.getLegalActions(state, playerId),
     runAiTurn: (state, playerId, hooks) => game.runAiTurn(state, playerId, hooks),
     snapshot: state => structuredClone(state),
@@ -13,6 +16,7 @@ export function createGameAdapter(game) {
       inspect: (...args) => game.playInspectCard(...args),
       tactic: (...args) => game.playTacticCard(...args),
       trump: (...args) => game.playTrumpCard(...args),
+      discard: (...args) => game.discardCard(...args),
       swapPass: (...args) => game.passTurnBySwappingCard(...args)
     })
   });
