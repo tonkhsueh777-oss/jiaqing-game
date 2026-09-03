@@ -5,6 +5,10 @@ export const STAGE_LAYOUT = Object.freeze({
     madou: Object.freeze({ id: 'madou', name: '麻豆古镇', slot: 'west', x: 0.22, y: 0.50, treasure: '柚子' }),
     mengxia: Object.freeze({ id: 'mengxia', name: '艋舺', slot: 'east', x: 0.78, y: 0.50, treasure: '火枪' }),
     zhuluo: Object.freeze({ id: 'zhuluo', name: '诸罗大营', slot: 'south', x: 0.5, y: 0.82, treasure: '宝剑' })
+  }),
+  deck: Object.freeze({
+    draw: Object.freeze({ id: 'draw', x: 0.12, y: 0.77 }),
+    discard: Object.freeze({ id: 'discard', x: 0.88, y: 0.77 })
   })
 });
 
@@ -43,6 +47,13 @@ export function buildStageModel(state, options = {}) {
     center: STAGE_LAYOUT.center,
     locations,
     players,
+    deck: {
+      draw: STAGE_LAYOUT.deck.draw,
+      discard: STAGE_LAYOUT.deck.discard,
+      drawCount: state?.drawPile?.length || 0,
+      discardCount: state?.discardPile?.length || 0,
+      topDiscard: state?.discardPile?.length ? { ...state.discardPile[state.discardPile.length - 1] } : null
+    },
     activePlayerId: state?.players?.[state.currentPlayerIndex]?.id || null,
     quality
   };
