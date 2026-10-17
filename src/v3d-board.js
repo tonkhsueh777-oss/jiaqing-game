@@ -80,7 +80,8 @@ const mats = {
   stone: new THREE.MeshStandardMaterial({color:0x99957b, roughness:0.95}),
   closed: new THREE.MeshStandardMaterial({color:0x52615d, roughness:0.8}),
   route: new THREE.MeshStandardMaterial({color:0x896f41, roughness:0.7, metalness:0.3}),
-  blue: new THREE.MeshStandardMaterial({color:0x29798b, roughness:0.55})
+  blue: new THREE.MeshStandardMaterial({color:0x29798b, roughness:0.55}),
+  target: new THREE.MeshStandardMaterial({color:0xffee97,emissive:0xffbd55,emissiveIntensity:.6})
 };
 function mesh(geometry, material, x=0,y=0,z=0) {
   const m = new THREE.Mesh(geometry, material);
@@ -96,7 +97,7 @@ scene.add(top);
 function labelTexture(text) {
   const c=document.createElement('canvas'); c.width=512; c.height=128;
   const ctx=c.getContext('2d');
-  ctx.fillStyle='rgba(5,28,32,.91)'; ctx.beginPath();ctx.roundRect(6,6,500,116,20);ctx.fill();
+  ctx.fillStyle='rgba(5,28,32,.91)'; ctx.beginPath();if(ctx.roundRect){ctx.roundRect(6,6,500,116,20);}else{ctx.rect(6,6,500,116);}ctx.fill();
   ctx.strokeStyle='#d7b26e';ctx.lineWidth=4;ctx.stroke();
   ctx.fillStyle='#ffe8b0';ctx.font='bold 44px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,64,465);
@@ -158,7 +159,7 @@ for(const [id,[x,z]] of Object.entries(POSITIONS)){
   beacon.rotation.x=Math.PI/2;group.add(beacon);
   scene.add(group);
   PICKABLE.push(group);
-  LOCATION_NODES[id]={group,inner,placeholder,beacon,card:null,loaded:false,modelPending:false};
+  LOCATION_NODES[id]={group,inner,placeholder,beacon,card:null,model:null,loaded:false,modelPending:false};
 }
 const PEOPLE={};
 for(const [index,id] of ['human','ai1','ai2'].entries()){
@@ -192,7 +193,7 @@ function addCustomGLB(id){
     model.position.y-=bounds.min.y-center.y;
     model.position.y+=.32;
     node.group.remove(node.placeholder);
-    node.group.add(model);node.loaded=true;
+    node.group.add(model);node.model=model;node.loaded=true;
   },undefined,err=>{node.modelPending=false;console.warn('3D模型加载失败，继续使用占位模型：'+path,err)});
 }
 function cardAtLocation(node,asset) {
@@ -217,14 +218,14 @@ function update(state){
     if(id==='center')continue;
     const opened=Boolean(state.openedLocations?.[id]);
     node.placeholder.visible=opened;
-    node.beacon.material=legalTargets.includes(id)?new THREE.MeshStandardMaterial({color:0xffee97,emissive:0xffbd55,emissiveIntensity:.6}):mats.gold;
+    if(node.model)node.model.visible=opened;
+    node.beacon.material=legalTargets.includes(id)?mats.target:mats.gold;
     node.inner.material=opened?mats.board:mats.closed;
     const asset=opened?(state.locationCards?.[id]?.asset||game.LOCATIONS?.[id]?.asset):null;
     if(lastCardAssets[id]!==asset){lastCardAssets[id]=asset;cardAtLocation(node,asset);}
     if(opened)addCustomGLB(id);
   }
-  LOCATION_NODES.center.beacon.material=legalTargets.includes('center')
-    ?new THREE.MeshStandardMaterial({color:0xffee97,emissive:0xffbd55,emissiveIntensity:.6}):mats.gold;
+  LOCATION_NODES.center.beacon.material=legalTargets.includes('center')?mats.target:mats.gold;
   const groups={};
   for(const p of state.players){(groups[p.position]??=[]).push(p);}
   for(const [id,pos] of Object.entries(PEOPLE)){
@@ -277,7 +278,9 @@ renderer.domElement.addEventListener('pointerup',event=>{
 });
 function resize(){
   const w=Math.max(1,container.clientWidth),h=Math.max(1,container.clientHeight);
-  camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.zoom=Math.min(1,Math.max(.62,(w/h)*.9));
+  camera.updateProjectionMatrix();renderer.setSize(w,h,false);
 }
 resize();
 new ResizeObserver(resize).observe(container);
