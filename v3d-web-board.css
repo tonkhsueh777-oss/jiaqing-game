@@ -41,3 +41,16 @@
 @media(max-width:768px) {
  .board-wrap .jq-3d-toggle { top:7px;right:7px;padding:6px 8px;font-size:11px; }
 }
+
+/* 新抽入手牌采用轻度3D翻牌入场，牌面与原有点击事件保持不变。 */
+.hand-card-button.card-enter-hand:not(:disabled) {
+  animation:jq3dDrawCard .44s ease-out both;
+}
+@keyframes jq3dDrawCard {
+  0% { opacity:.65;transform:translateY(18px) rotateY(-62deg) rotateX(10deg) scale(.88); }
+  75% { opacity:1;transform:translateY(-5px) rotateY(8deg) scale(1.025); }
+  100% { opacity:1;transform:translateY(0) rotateY(0deg) scale(1); }
+}
+@media(prefers-reduced-motion:reduce) {
+ .hand-card-button.card-enter-hand:not(:disabled) { animation:none; }
+}
